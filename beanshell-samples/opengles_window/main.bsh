@@ -1,0 +1,1031 @@
+/*
+ * Copyright 2025 Aquiles Trindade (trindadedev).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.GradientDrawable;
+import android.opengl.GLES32;
+import android.opengl.GLUtils;
+import android.opengl.Matrix;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import dev.trindadedev.tbsh.event.Event;
+import dev.trindadedev.tbsh.project.API.Version;
+import dev.trindadedev.tbsh.util.FileUtil;
+import dev.trindadedev.tbsh.opengl.BSHGLSurfaceView;
+import dev.trindadedev.tbsh.opengl.BSHGLRenderer;
+import dev.trindadedev.tbsh.opengl.BSHGLRenderer.RendererEvents;
+import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
+import java.util.List;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
+// project infos
+api.project.setName("GTA 6");
+api.project.setDescription("The GTA 6!");
+api.project.setApiVersion(Version.One);
+api.project.setAuthor(
+  "Aquiles Trindade",
+  "trindadedev");
+
+// the root folder of the project.
+// used for map shaders and more
+// change this to the folder directory where this file is
+final File project_file = new File("/sdcard/bsh/opengles");
+
+final MaterialButton open_window_button = new MaterialButton(context);
+
+// ------------- GAME VARS ---------------
+
+float cube_x = 0f;
+float cube_y = 0f;
+float cube_z = 0f;
+float cube_angle = 0f;
+
+// ------------- END GAME VARS -----------
+
+// ------------- UTILS -------------------
+
+// loads an glsl shader
+
+final int EXIT_SUCCESS = 0;
+final int EXIT_ERROR = 1;
+
+int utils_load_shader(int type, String shader_code) {
+  int shader = GLES32.glCreateShader(type);
+  GLES32.glShaderSource(shader, shader_code);
+  GLES32.glCompileShader(shader);
+  return shader;
+}
+
+// returns the current ativity package
+String utils_current_activity_package() {
+  final ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+  final List<RunningTaskInfo> task_info = am.getRunningTasks(1);
+  final ComponentName component_info = task_info.get(0).topActivity;
+  return component_info.getClassName();
+}
+
+// open an app by package
+// it dont work idk why, fuck
+int utils_open_app(String app_package) {
+  final PackageManager pm = context.getPackageManager();
+  final Intent launch_intent = pm.getLaunchIntentForPackage(app_package);
+  if (launch_intent != null) {
+    context.startActivity(launch_intent);
+    return EXIT_SUCCESS;
+  } else {
+    return EXIT_ERROR;
+  }
+  return EXIT_SUCCESS;
+}
+
+// compares the current activity name with api context name
+boolean utils_current_context_is_equal_api_context() {
+  final String current_activity = utils_current_activity_package();
+  final String runner_activity = context.getClass().getSimpleName();
+  final String current_activity_name = current_activity.substring(current_activity.lastIndexOf(".") + 1);
+  return runner_activity.equals(current_activity_name);
+}
+
+boolean utils_simple_dialog_is_opened = false;
+
+void utils_show_simple_dialog(
+  String dialog_title, String dialog_message,
+  String str_on_confirm, String str_on_cancel,
+  Event on_confirm, Event on_cancel) {
+
+  if (utils_simple_dialog_is_opened) return;
+  if (!utils_current_context_is_equal_api_context()) return;
+
+  new MaterialAlertDialogBuilder(context)
+    .setTitle(dialog_title)
+    .setMessage(dialog_message)
+    .setPositiveButton(str_on_confirm, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface di, int which) {
+        on_confirm.onCallEvent();
+        utils_simple_dialog_is_opened = false;
+      }
+    })
+    .setNegativeButton(str_on_cancel, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface di, int whick) {
+        on_cancel.onCallEvent();
+        utils_simple_dialog_is_opened = false;
+      }
+    })
+    .show();
+  utils_simple_dialog_is_opened = true;
+}
+
+// idk if its working
+// but should work
+int utils_load_texture(String imagePath) {
+  int[] utils_texture = new int[1];
+
+  BitmapFactory.Options options = new BitmapFactory.Options();
+  options.inScaled = false;
+  Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+
+  GLES32.glGenTextures(1, utils_texture, 0);
+
+  GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, utils_texture[0]);
+ // GLES32.glTexParameterf(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MIN_FILTER, GLES32.GL_LINEAR);
+ // GLES32.glTexParameterf(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MAG_FILTER, GLES32.GL_LINEAR);
+
+  GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_WRAP_S, GLES32.GL_REPEAT);	
+  GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_WRAP_T, GLES32.GL_REPEAT);
+  GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MIN_FILTER, GLES32.GL_LINEAR_MIPMAP_LINEAR);
+  GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MAG_FILTER, GLES32.GL_LINEAR);
+
+  GLUtils.texImage2D(GLES32.GL_TEXTURE_2D, 0, bitmap, 0);
+
+  bitmap.recycle();
+
+  return utils_texture[0];
+}
+
+// ------------- END UTILS ---------------
+
+// ------------- UI ----------------------
+
+// creates an rounded gradient drawable with provided color and radius in all corners
+GradientDrawable ui_rounded_shape(int color, int radius) {
+  return ui_rounded_shape(color, new float[] {
+    radius, radius, // top left
+    radius, radius, // top right
+    radius, radius, // bottom right
+    radius, radius  // bottom left
+  });
+}
+
+// creates an rounded gradient drawable with more-specific radius
+GradientDrawable ui_rounded_shape(int color, float[] radii) {
+  GradientDrawable shape = new GradientDrawable();
+  shape.setColor(color);
+  shape.setCornerRadii(radii);
+  return shape;
+}
+
+// creates an button
+MaterialButton ui_create_button(String btn_text, Event on_click) {
+  MaterialButton btn = new MaterialButton(context);
+  btn.setText(btn_text);
+  btn.setOnClickListener(new View.OnClickListener() {
+    public void onClick(View g) {
+      on_click.onCallEvent();
+    }
+  });
+  return btn;
+}
+
+View ui_create_basic_spacer(int width, int height, float weight) {
+  View spacer = new View(context);
+  spacer.setLayoutParams(new LinearLayout.LayoutParams(width, height, weight));
+  return spacer;
+}
+
+// ------------- END UI ------------------
+
+// ------------- WINDOW ------------------
+
+final WindowManager window_manager = api.getWindowManager();
+
+// window dimens
+final int WINDOW_WIDTH = 800;
+final int WINDOW_HEIGHT = 400;
+final int WINDOW_BACKGROUND_PADDING = 0;
+final int WINDOW_BACKGROUND_CORNER_RADIUS = 25;
+final float[] WINDOW_HEADER_CORNER_RADII = {
+  10, 10, // top left
+  10, 10, // top right
+  0,  0,  // bottom right
+  0,  0,  // bottom left
+};
+final int WINDOW_HEADER_TITLE_SIZE = 12;
+final int WINDOW_HEADER_CLOSE_BUTTON_SIZE = 10;
+final int WINDOW_HEADER_MAXIMIZE_MINIMIZE_BUTTON_SIZE = 10;
+final int WINDOW_HEADER_BUTTON_CORNER_RADIUS = 100;
+
+// window colors
+final int WINDOW_BACKGROUND_COLOR = 0xFF000000;
+final int WINDOW_HEADER_COLOR = 0xFF212121;
+final int WINDOW_HEADER_CLOSE_BUTTON_COLOR = Color.RED;
+final int WINDOW_HEADER_MAXIMIZE_MINIMIZE_BUTTON_COLOR = Color.BLUE;
+
+// window views/widgets
+final int WINDOW_VIEWS_COUNT = 11;
+final View[] window_views = new View[WINDOW_VIEWS_COUNT];
+
+// use this to get the views/widgets from the array
+final int WINDOW_VIEWS_BACKGROUND = 0;
+final int WINDOW_VIEWS_HEADER = 1;
+final int WINDOW_VIEWS_HEADER_TITLE = 2;
+final int WINDOW_VIEWS_HEADER_CLOSE_BUTTON = 3;
+final int WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON = 7;
+final int WINDOW_VIEWS_GL_SURFACE = 4;
+final int WINDOW_VIEWS_MOVE_BUTTONS_ROW = 8;
+final int WINDOW_VIEWS_MOVE_BUTTON_UP = 5;
+final int WINDOW_VIEWS_MOVE_BUTTON_DOWN = 6;
+final int WINDOW_VIEWS_MOVE_BUTTON_LEFT = 9;
+final int WINDOW_VIEWS_MOVE_BUTTON_RIGHT = 10;
+
+final int WINDOW_GL_VIEW_MARGIN = 8;
+
+WindowManager.LayoutParams window_params;
+
+boolean window_is_attached = false;
+boolean window_is_maximized = false;
+
+// window callbacks
+
+// called when user touch window
+void window_callback_touched(MotionEvent event) {
+
+}
+
+// called when user move window
+void window_callback_moved(MotionEvent event,
+  int newX, int newX) {
+}
+
+// called when user open window
+void window_callback_opened() {
+  open_window_button.setVisibility(View.GONE);
+}
+
+// called when user close window
+void window_callback_closed() {
+  open_window_button.setVisibility(View.VISIBLE);
+}
+
+// called when user click in move up down
+void window_callback_buttons_up() {
+  cube_y++;
+}
+
+// called when user click in move down button
+void window_callback_buttons_down() {
+  cube_y--;
+}
+
+// called when user click in move left button
+void window_callback_buttons_left() {
+  cube_x++;
+}
+
+// called when user click in move right button
+void window_callback_buttons_right() {
+  cube_x--;
+}
+
+// configure program window
+void window_init() {
+  window_params = new WindowManager.LayoutParams(
+      WindowManager.LayoutParams.WRAP_CONTENT,
+      WindowManager.LayoutParams.WRAP_CONTENT,
+      WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+      WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+      PixelFormat.TRANSLUCENT
+  );
+  window_params.gravity = Gravity.CENTER;
+
+  // instanciate window views
+  window_views[WINDOW_VIEWS_BACKGROUND] = new LinearLayout(context);                     // Window Root
+  window_views[WINDOW_VIEWS_HEADER] = new LinearLayout(context);                         // Window Header
+  window_views[WINDOW_VIEWS_HEADER_TITLE] = new TextView(context);                       // Window Header Title
+  window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON] = new TextView(context);                // Window Header Close Button
+  window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON] = new TextView(context);    // Window Header Maximize Button
+  window_views[WINDOW_VIEWS_GL_SURFACE] = new BSHGLSurfaceView(context);                 // OpenGL ES Surface
+  window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW] = new LinearLayout(context);               // Buttons Row
+  window_views[WINDOW_VIEWS_MOVE_BUTTON_UP] = ui_create_button("UP", new Event() {       // UP Button
+    public void onCallEvent() {
+      window_callback_buttons_up();
+    }
+  });
+  window_views[WINDOW_VIEWS_MOVE_BUTTON_DOWN] = ui_create_button("DOWN", new Event() {   // Down Button
+    public void onCallEvent() {
+      window_callback_buttons_down();
+    }
+  });
+  window_views[WINDOW_VIEWS_MOVE_BUTTON_LEFT] = ui_create_button("LEFT", new Event() {   // LEFT Button
+    public void onCallEvent() {
+      window_callback_buttons_left();
+    }
+  });
+  window_views[WINDOW_VIEWS_MOVE_BUTTON_RIGHT] = ui_create_button("RIGHT", new Event() { // RIGHT Button
+    public void onCallEvent() {
+      window_callback_buttons_right();
+    }
+  });
+  // end instanciation of window views
+
+  // window background config
+  window_views[WINDOW_VIEWS_BACKGROUND].setLayoutParams(new LinearLayout.LayoutParams(
+      WINDOW_WIDTH,
+      WINDOW_HEIGHT));
+
+  window_views[WINDOW_VIEWS_BACKGROUND].setBackground(ui_rounded_shape(WINDOW_BACKGROUND_COLOR, WINDOW_BACKGROUND_CORNER_RADIUS));
+  window_views[WINDOW_VIEWS_BACKGROUND].setOrientation(LinearLayout.VERTICAL);
+  window_views[WINDOW_VIEWS_BACKGROUND].setPadding(
+      WINDOW_BACKGROUND_PADDING,  // left
+      WINDOW_BACKGROUND_PADDING,  // top
+      WINDOW_BACKGROUND_PADDING,  // right
+      WINDOW_BACKGROUND_PADDING); // bottom
+  // end window background config
+  
+  // window movement
+  window_views[WINDOW_VIEWS_BACKGROUND].setOnTouchListener(new View.OnTouchListener() {
+    int initialX, initialY;
+    float initialTouchX, initialTouchY;
+
+    public boolean onTouch(View v, MotionEvent event) {
+      switch (event.getAction()) {
+        case MotionEvent.ACTION_DOWN:
+          initialX = window_params.x;
+          initialY = window_params.y;
+          initialTouchX = event.getRawX();
+          initialTouchY = event.getRawY();
+          window_callback_touched(event);
+          return true;
+        case MotionEvent.ACTION_MOVE:
+          int newX = initialX + (int) (event.getRawX() - initialTouchX);
+          int newY = initialY + (int) (event.getRawY() - initialTouchY);
+          window_params.x = newX;
+          window_params.y = newY;
+          window_manager.updateViewLayout(window_views[WINDOW_VIEWS_BACKGROUND], window_params);
+          window_callback_moved(event, newX, newY);
+          return true;
+      }
+      return false;
+    }
+  });
+  // end window movement
+
+  // add window views to window background
+  window_views[WINDOW_VIEWS_BACKGROUND].addView(window_views[WINDOW_VIEWS_HEADER]);                      // add header into background
+  window_views[WINDOW_VIEWS_HEADER].addView(window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON]);             // add header close button into header
+  window_views[WINDOW_VIEWS_HEADER].addView(window_views[WINDOW_VIEWS_HEADER_TITLE]);                    // add header title into header
+  window_views[WINDOW_VIEWS_HEADER].addView(window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON]); // add header maximize button into header
+  window_views[WINDOW_VIEWS_BACKGROUND].addView(window_views[WINDOW_VIEWS_GL_SURFACE]);                  // add opengl view into background
+  window_views[WINDOW_VIEWS_BACKGROUND].addView(window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW]);            // add move buttons row into background
+  window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW].addView(window_views[WINDOW_VIEWS_MOVE_BUTTON_UP]);        // add move up into background
+  window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW].addView(window_views[WINDOW_VIEWS_MOVE_BUTTON_DOWN]);      // add move down into background
+  
+  // add spacers
+  // spacers are not added to the views array.
+  window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW].addView(
+    ui_create_basic_spacer(
+      0,
+      LinearLayout.LayoutParams.MATCH_PARENT,
+      1f));
+  // end add spacers
+
+  // continue add window views to window background
+  window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW].addView(window_views[WINDOW_VIEWS_MOVE_BUTTON_LEFT]);        // add move left into background
+  window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW].addView(window_views[WINDOW_VIEWS_MOVE_BUTTON_RIGHT]);       // add move right into background
+  // end add window views to window background
+
+  // window header background
+  window_views[WINDOW_VIEWS_HEADER].setLayoutParams(new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.MATCH_PARENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT));
+
+  window_views[WINDOW_VIEWS_HEADER].setBackground(ui_rounded_shape(WINDOW_HEADER_COLOR, WINDOW_HEADER_CORNER_RADII));
+
+  window_views[WINDOW_VIEWS_HEADER].setPadding(
+      10, // left
+      0,  // top
+      0,  // right
+      0); // bottom
+  // window header background
+
+  // window header title
+  LinearLayout.LayoutParams window_header_title_view_params = new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      1);
+  window_header_title_view_params.setMargins(
+      5,   // left
+      0,   // top
+      10,  // right
+      0);  // bottom
+  window_views[WINDOW_VIEWS_HEADER_TITLE].setPadding(
+    8,  // left
+    0,  // top
+    8,  // right
+    0); // bottom
+  window_views[WINDOW_VIEWS_HEADER_TITLE].setLayoutParams(window_header_title_view_params);
+  window_views[WINDOW_VIEWS_HEADER_TITLE].setText(api.project.name);
+  window_views[WINDOW_VIEWS_HEADER_TITLE].setTextSize(WINDOW_HEADER_TITLE_SIZE);
+  // end window header title
+
+  // window header close button
+  LinearLayout.LayoutParams window_header_close_view_params = new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT);
+  window_header_close_view_params.setMargins(
+      5,   // left
+      0,   // top
+      10,  // right
+      0);  // bottom
+  window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON].setPadding(
+    8,  // left
+    0,  // top
+    8,  // right
+    0); // bottom
+  window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON].setLayoutParams(window_header_close_view_params);
+  window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON].setText("X");
+  window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON].setTextSize(WINDOW_HEADER_CLOSE_BUTTON_SIZE);
+  window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON].setBackground(ui_rounded_shape(WINDOW_HEADER_CLOSE_BUTTON_COLOR, WINDOW_HEADER_BUTTON_CORNER_RADIUS));
+  window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON].setOnClickListener(new View.OnClickListener() {
+    public void onClick(View v) {
+      // close window directly if user is not in runner app
+      if (!utils_current_context_is_equal_api_context()) {
+        window_close();
+        return;
+      }
+      // show an dialog to ask to close dialog
+      utils_show_simple_dialog(
+        "Close " + api.project.name + "?", // title
+        "All data will be lost!",          // message
+        "Close", "Cancel",                 // Confirm, Cancel buttons text
+        new Event() {                      // On confirm event
+          public void onCallEvent() {
+            window_close();
+          }
+        },
+        new Event() {                      // On cancel event
+          public void onCallEvent() {
+            // do literally nothing
+          }
+        }
+      );
+    }
+  });
+  // end window header close button
+
+  // window header maximize button
+  LinearLayout.LayoutParams window_header_maximize_view_params = new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT);
+  window_header_maximize_view_params.setMargins(
+      5,   // left
+      0,   // top
+      10,  // right
+      0);  // bottom
+  window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON].setPadding(
+    8,  // left
+    0,  // top
+    8,  // right
+    0); // bottom
+  window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON].setLayoutParams(window_header_maximize_view_params);
+  window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON].setText("%");
+  window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON].setTextSize(WINDOW_HEADER_MAXIMIZE_MINIMIZE_BUTTON_SIZE);
+  window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON].setBackground(ui_rounded_shape(WINDOW_HEADER_MAXIMIZE_MINIMIZE_BUTTON_COLOR, WINDOW_HEADER_BUTTON_CORNER_RADIUS));
+  window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON].setOnClickListener(new View.OnClickListener() {
+    public void onClick(View g) {
+      if (window_is_maximized) {
+        window_minimize();
+      } else {
+        window_maximize();
+      }
+    }
+  });
+  // end window header maximize button
+
+  // opengles view
+  LinearLayout.LayoutParams window_gl_view_params = new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      1);
+  window_gl_view_params.setMargins(
+      WINDOW_GL_VIEW_MARGIN,  // left
+      WINDOW_GL_VIEW_MARGIN,  // top
+      WINDOW_GL_VIEW_MARGIN,  // right
+      WINDOW_GL_VIEW_MARGIN); // bottom
+  window_views[WINDOW_VIEWS_GL_SURFACE].setLayoutParams(window_gl_view_params);
+  // end opengles view
+
+  // move buttons row
+  window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW].setGravity(Gravity.LEFT);
+  // end move buttons row
+
+  // move up button
+  window_views[WINDOW_VIEWS_MOVE_BUTTON_UP].setLayoutParams(new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT));
+  // end move up button
+
+  // move down button
+  window_views[WINDOW_VIEWS_MOVE_BUTTON_DOWN].setLayoutParams(new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT));
+  // end move down button
+
+  // move left button
+  window_views[WINDOW_VIEWS_MOVE_BUTTON_LEFT].setLayoutParams(new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT));
+  // end move left button
+
+  // move right button
+  window_views[WINDOW_VIEWS_MOVE_BUTTON_RIGHT].setLayoutParams(new LinearLayout.LayoutParams(
+      LinearLayout.LayoutParams.WRAP_CONTENT,
+      LinearLayout.LayoutParams.WRAP_CONTENT));
+  // end move right button
+}
+
+// opens the program window
+void window_open() {
+  if (window_is_attached) {
+    return;
+  }
+  window_manager.addView(window_views[WINDOW_VIEWS_BACKGROUND], window_params);
+  window_is_attached = true;
+  window_callback_opened();
+}
+
+// closes the program window
+void window_close() {
+  if (window_manager != null && window_is_attached) {
+    window_manager.removeViewImmediate(window_views[WINDOW_VIEWS_BACKGROUND]);
+    window_is_attached = false;
+    window_callback_closed();
+  }
+}
+
+void window_maximize() {
+  window_resize(
+      LinearLayout.LayoutParams.MATCH_PARENT,  // width
+      LinearLayout.LayoutParams.MATCH_PARENT,  // height
+      0f,                                      // vertical weight
+      0f);                                     // horizontal weight
+  window_is_maximized = true;
+}
+
+void window_minimize() {
+  window_resize(
+      WINDOW_WIDTH,  // width
+      WINDOW_HEIGHT, // height
+      0f,            // vertical weight
+      0f);           // horizontal weight
+  window_is_maximized = false;
+}
+
+void window_resize(int width, int height, float vertical_weight, float horizontal_weight) {
+  window_params.width = width;
+  window_params.height = height;
+  window_params.verticalWeight = vertical_weight;
+  window_params.horizontalWeight = horizontal_weight;
+  window_manager.updateViewLayout(window_views[WINDOW_VIEWS_BACKGROUND], window_params);
+}
+
+// ------------- END WINDOW --------------
+
+final int COORDS_PER_VERTEX = 3;
+
+// ------------- CUBE --------------------
+
+final int CUBE_MAX_OBJECTS = 24; // max cubes supported in scene
+int total_cubes_count = 0; // current cubes diplayed count
+
+FloatBuffer[] cube_vertex_buffers = new FloatBuffer[CUBE_MAX_OBJECTS];
+FloatBuffer[] cube_color_buffers = new FloatBuffer[CUBE_MAX_OBJECTS];
+ShortBuffer[] cube_draw_list_buffers = new ShortBuffer[CUBE_MAX_OBJECTS];
+
+int[] cube_programs = new int[CUBE_MAX_OBJECTS];
+
+float[][] cube_model_matrices = new float[CUBE_MAX_OBJECTS][16];
+
+final float[] cube_vertices = {
+  -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f,
+  -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f
+};
+
+final short[] cube_draw_order = {
+  0, 1, 2, 0, 2, 3,
+  4, 5, 6, 4, 6, 7,
+  0, 1, 5, 0, 5, 4,
+  2, 3, 7, 2, 7, 6,
+  0, 3, 7, 0, 7, 4,
+  1, 2, 6, 1, 6, 5
+};
+
+void cube_create(float[] colors) {
+  if (total_cubes_count >= CUBE_MAX_OBJECTS) {
+    context.runOnUiThread(new Runnable() {
+      public void run() {
+        api.addErrorLog("Cube limit reached. Increase it before add new cube.");
+      }
+    });
+    return;
+  }
+
+  final int index = total_cubes_count;
+
+  // buffers
+  final ByteBuffer bb = ByteBuffer.allocateDirect(cube_vertices.length * 4); // 4 bytes per float
+  bb.order(ByteOrder.nativeOrder());
+  cube_vertex_buffers[index] = bb.asFloatBuffer();
+  cube_vertex_buffers[index].put(cube_vertices);
+  cube_vertex_buffers[index].position(0);
+
+  final ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4); // 4 bytes per float
+  cb.order(ByteOrder.nativeOrder());
+  cube_color_buffers[index] = cb.asFloatBuffer();
+  cube_color_buffers[index].put(colors);
+  cube_color_buffers[index].position(0);
+
+  final ByteBuffer dlb = ByteBuffer.allocateDirect(cube_draw_order.length * 2); // 2 bytes per shot
+  dlb.order(ByteOrder.nativeOrder());
+  cube_draw_list_buffers[index] = dlb.asShortBuffer();
+  cube_draw_list_buffers[index].put(cube_draw_order);
+  cube_draw_list_buffers[index].position(0);
+
+  // reads shaders from shaders/cube folder.
+  final String vertex_shader_code = FileUtil.readFile(new File(project_file, "shaders/cube/vertex_shader.vert"));
+  final String fragment_shader_code = FileUtil.readFile(new File(project_file, "shaders/cube/fragment_shader.frag"));
+  final int vertex_shader = utils_load_shader(GLES32.GL_VERTEX_SHADER, vertex_shader_code);
+  final int fragment_shader = utils_load_shader(GLES32.GL_FRAGMENT_SHADER, fragment_shader_code);
+
+  // link program and shaders
+  cube_programs[index] = GLES32.glCreateProgram();
+  GLES32.glAttachShader(cube_programs[index], vertex_shader);
+  GLES32.glAttachShader(cube_programs[index], fragment_shader);
+  GLES32.glLinkProgram(cube_programs[index]);
+  Matrix.setIdentityM(cube_model_matrices[index], 0);
+  total_cubes_count++;
+}
+
+void cube_draw(int program, FloatBuffer vertex_buffer,
+  FloatBuffer color_buffer, ShortBuffer draw_list_buffer,
+  float[] mvp_matrix) {
+
+  GLES32.glUseProgram(program);
+
+  final int position_handle = GLES32.glGetAttribLocation(program, "vPosition");
+  GLES32.glEnableVertexAttribArray(position_handle);
+  GLES32.glVertexAttribPointer(
+      position_handle, COORDS_PER_VERTEX, GLES32.GL_FLOAT, false, 0, vertex_buffer);
+
+  final int color_handle = GLES32.glGetAttribLocation(program, "vColor");
+  GLES32.glEnableVertexAttribArray(color_handle);
+  GLES32.glVertexAttribPointer(color_handle, 4, GLES32.GL_FLOAT, false, 0, color_buffer);
+
+  final int matrix_handle = GLES32.glGetUniformLocation(program, "uMVPMatrix");
+  GLES32.glUniformMatrix4fv(matrix_handle, 1, false, mvp_matrix, 0);
+
+  GLES32.glDrawElements(
+      GLES32.GL_TRIANGLES, cube_draw_order.length, GLES32.GL_UNSIGNED_SHORT, draw_list_buffer);
+
+  // disable vertex attributes
+  GLES32.glDisableVertexAttribArray(position_handle);
+  GLES32.glDisableVertexAttribArray(color_handle);
+}
+
+void cube_set_color(int index, float[] color) {
+  final ByteBuffer b = ByteBuffer.allocateDirect(color.length * 4); // 4 byter per float
+  b.order(ByteOrder.nativeOrder());
+  cube_color_buffers[index] = b.asFloatBuffer();
+  cube_color_buffers[index].put(color);
+  cube_color_buffers[index].position(0);
+}
+
+void cube_remove_all() {
+  total_cubes_count = 0;
+
+  cube_vertex_buffers = new FloatBuffer[CUBE_MAX_OBJECTS];
+  cube_color_buffers = new FloatBuffer[CUBE_MAX_OBJECTS];
+  cube_draw_list_buffers = new ShortBuffer[CUBE_MAX_OBJECTS];
+  cube_programs = new int[CUBE_MAX_OBJECTS];
+  cube_model_matrices = new float[CUBE_MAX_OBJECTS][16];
+}
+
+// ------------ END CUBE -----------------
+
+// ------------ SPHERE -------------------
+
+final int SPHERE_MAX_OBJECTS = 24;
+
+int total_spheres_count = 0;
+
+int[] sphere_vertices = new int[SPHERE_MAX_OBJECTS];
+int[] sphere_programs = new int[SPHERE_MAX_OBJECTS];
+
+float[][] sphere_colors = new float[SPHERE_MAX_OBJECTS][4];
+float[][] sphere_model_matrices = new float[SPHERE_MAX_OBJECTS][16];
+
+FloatBuffer[] sphere_vertex_buffers = new FloatBuffer[SPHERE_MAX_OBJECTS];
+IntBuffer[] sphere_index_buffers = new IntBuffer[SPHERE_MAX_OBJECTS];
+
+void sphere_create(float radius, int stacks, int slices, float[] color) {
+  if (total_spheres_count >= SPHERE_MAX_OBJECTS) {
+    context.runOnUiThread(new Runnable() {
+      public void run() {
+        api.addErrorLog("Sphere limit reached. Increase it before adding a new sphere.");
+      }
+    });
+    return;
+  }
+
+  final int index = total_spheres_count;
+
+  sphere_colors[index] = color;
+
+  final int vertex_count = (stacks + 1) * (slices + 1);
+  final float[] sphere_coords = new float[vertex_count * COORDS_PER_VERTEX];
+
+  int count = 0;
+  for (int i = 0; i <= stacks; i++) {
+    float phi = (float) Math.PI * i / stacks;
+    for (int j = 0; j <= slices; j++) {
+      float theta = (float) (2.0f * Math.PI * j / slices);
+
+      float x = (float) (Math.sin(phi) * Math.cos(theta)) * radius;
+      float y = (float) (Math.sin(phi) * Math.sin(theta)) * radius;
+      float z = (float) Math.cos(phi) * radius;
+
+      sphere_coords[count++] = x;
+      sphere_coords[count++] = y;
+      sphere_coords[count++] = z;
+    }
+  }
+
+  // create index buffer for sphere triangles
+  final int[] indices = new int[stacks * slices * 6];
+  int index_count = 0;
+  for (int i = 0; i < stacks; i++) {
+    for (int j = 0; j < slices; j++) {
+      int first = (i * (slices + 1)) + j;
+      int second = first + slices + 1;
+
+      indices[index_count++] = first;
+      indices[index_count++] = second;
+      indices[index_count++] = first + 1;
+
+      indices[index_count++] = second;
+      indices[index_count++] = second + 1;
+      indices[index_count++] = first + 1;
+    }
+  }
+
+  // setup vertex buffer
+  final ByteBuffer bb = ByteBuffer.allocateDirect(sphere_coords.length * 4);
+  bb.order(ByteOrder.nativeOrder());
+  sphere_vertex_buffers[index] = bb.asFloatBuffer();
+  sphere_vertex_buffers[index].put(sphere_coords);
+  sphere_vertex_buffers[index].position(0);
+
+  // setup index buffer
+  final ByteBuffer ib = ByteBuffer.allocateDirect(indices.length * 4);
+  ib.order(ByteOrder.nativeOrder());
+  sphere_index_buffers[index] = ib.asIntBuffer();
+  sphere_index_buffers[index].put(indices);
+  sphere_index_buffers[index].position(0);
+
+  // load shaders
+  final String vertex_shader_code = FileUtil.readFile(new File(project_file, "shaders/sphere/vertex_shader.vert"));
+  final String fragment_shader_code = FileUtil.readFile(new File(project_file, "shaders/sphere/fragment_shader.frag"));
+  final int vertex_shader = utils_load_shader(GLES32.GL_VERTEX_SHADER, vertex_shader_code);
+  final int fragment_shader = utils_load_shader(GLES32.GL_FRAGMENT_SHADER, fragment_shader_code);
+
+  sphere_programs[index] = GLES32.glCreateProgram();
+  GLES32.glAttachShader(sphere_programs[index], vertex_shader);
+  GLES32.glAttachShader(sphere_programs[index], fragment_shader);
+  GLES32.glLinkProgram(sphere_programs[index]);
+
+  Matrix.setIdentityM(sphere_model_matrices[index], 0);
+  total_spheres_count++;
+}
+
+void sphere_draw(int program, FloatBuffer vertex_buffer, IntBuffer index_buffer, float[] color, float[] mvp_matrix) {
+  GLES32.glUseProgram(program);
+
+  final int position_handle = GLES32.glGetAttribLocation(program, "vPosition");
+  GLES32.glEnableVertexAttribArray(position_handle);
+  GLES32.glVertexAttribPointer(
+      position_handle, COORDS_PER_VERTEX, GLES32.GL_FLOAT, false, 0, vertex_buffer);
+
+  final int color_handle = GLES32.glGetUniformLocation(program, "vColor");
+  GLES32.glUniform4fv(color_handle, 1, color, 0);
+
+  final int matrix_handle = GLES32.glGetUniformLocation(program, "uMVPMatrix");
+  GLES32.glUniformMatrix4fv(matrix_handle, 1, false, mvp_matrix, 0);
+
+  GLES32.glDrawElements(GLES32.GL_TRIANGLES, index_buffer.limit(), GLES32.GL_UNSIGNED_INT, index_buffer);
+  GLES32.glDisableVertexAttribArray(position_handle);
+}
+
+void sphere_set_color(int index, float[] color) {
+  sphere_colors[index] = color;
+}
+
+void sphere_remove_all() {
+  total_spheres_count = 0;
+
+  sphere_vertices = new int[SPHERE_MAX_OBJECTS];
+  sphere_programs = new int[SPHERE_MAX_OBJECTS];
+  sphere_colors = new float[SPHERE_MAX_OBJECTS][4];
+  sphere_model_matrices = new float[SPHERE_MAX_OBJECTS][16];
+  sphere_vertex_buffers = new FloatBuffer[SPHERE_MAX_OBJECTS];
+  sphere_index_buffers = new IntBuffer[SPHERE_MAX_OBJECTS];
+}
+
+// ------------ END SPHERE ---------------
+
+// ------------ MAIN ---------------------
+
+float[] view_matrix = new float[16];
+float[] mvp_matrix = new float[16];
+float[] model_matrix = new float[16];
+float[] projection_matrix = new float[16];
+
+void remove_all() {
+  cube_remove_all();
+  sphere_remove_all();
+}
+
+int main() {
+  window_init();
+  window_open();
+  window_minimize(); // minimize window to fix sizes
+
+  // make game landscape
+  context.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+  // button to open window when its closed
+  open_window_button.setText("Open window");
+  open_window_button.setOnClickListener(new View.OnClickListener() {
+    public void onClick(View g) {
+      remove_all();
+      window_open();
+    }
+  });
+  api.addViewAtRoot(open_window_button);
+
+  boolean movingUp = true;
+
+  final BSHGLRenderer renderer = window_views[WINDOW_VIEWS_GL_SURFACE].getRenderer();
+
+  renderer.events.setOnSurfaceCreated(new RendererEvents.OnSurfaceCreated() {
+    public void onCallEvent(GL10 gl, EGLConfig config) {
+      GLES32.glEnable(GLES32.GL_DEPTH_TEST);
+      GLES32.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+      cube_create(new float[] {
+        1.0f, 0.5f, 1.0f, 1.0f,
+        1.0f, 0.5f, 1.0f, 1.0f,
+        1.0f, 0.5f, 1.0f, 1.0f,
+        1.0f, 0.5f, 1.0f, 1.0f,
+        1.0f, 0.5f, 1.0f, 1.0f,
+        1.0f, 0.5f, 1.0f, 1.0f,
+        1.0f, 0.5f, 1.0f, 1.0f,
+        1.0f, 0.5f, 1.0f, 1.0f
+      });
+    }
+  });
+
+  renderer.events.setOnSurfaceChanged(new RendererEvents.OnSurfaceChanged() {
+    public void onCallEvent(GL10 gl, int width, int height) {
+      GLES32.glViewport(0, 0, width, height);
+      final float ratio = (float) width / height;
+      Matrix.frustumM(
+        projection_matrix,
+        0,
+        -ratio,
+        ratio,
+        -1,
+        1,
+        1f,  // near
+        10f); // far
+    }
+  });
+
+  renderer.events.setOnDrawFrame(new RendererEvents.OnDrawFrame() {
+    public void onCallEvent(GL10 gl) {
+      GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT);
+
+      Matrix.setLookAtM(view_matrix, 0,
+          0f, 0f, -7f,  // Camera position
+          0f, 0f, 0f,   // Look at origin
+          0f, .5f, 0f); // Up vector
+
+      // draw all cubes
+      for (int i = 0; i < total_cubes_count; i++) {
+        Matrix.setIdentityM(cube_model_matrices[i], 0);
+
+        Matrix.translateM(
+          cube_model_matrices[i], // matrix
+          0,                      // index into m where the matrix starts
+          cube_x,                 // x
+          cube_y,                 // y
+          cube_z);                // z
+        Matrix.rotateM(
+            cube_model_matrices[i], // matrix
+            0,                      // matrix offset
+            cube_angle,             // angle
+            0f,                     // maybe x?
+            1.0f,                   // maybe y?
+            0f);                    // maybe z?
+
+        float[] temp_matrix = new float[16];
+        Matrix.multiplyMM(temp_matrix, 0, view_matrix, 0, cube_model_matrices[i], 0);
+        Matrix.multiplyMM(mvp_matrix, 0, projection_matrix, 0, temp_matrix, 0);
+
+        cube_draw(
+          cube_programs[i],
+          cube_vertex_buffers[i],
+          cube_color_buffers[i],
+          cube_draw_list_buffers[i],
+          mvp_matrix);
+      }
+
+      // spheres not are used now
+      // but i'wont delete the code
+      // draw spheres if have it
+      for (int i = 0; i < total_spheres_count; i++) {
+        Matrix.setIdentityM(sphere_model_matrices[i], 0);
+
+        Matrix.translateM(
+            sphere_model_matrices[i], // matrix
+            0,  // index into m where the matrix starts
+            ((i - total_spheres_count / 2) * 2f),  // x
+            0f + 2f,  // y
+            0f);  // z
+        Matrix.rotateM(
+            sphere_model_matrices[i], // matrix
+            0,                        // matrix offset
+            0f,                       // angle
+            0f,                       // maybe x?
+            1.0f,                     // maybe y?
+            0f);                      // maybe z?
+
+        float[] temp_matrix = new float[16];
+        Matrix.multiplyMM(temp_matrix, 0, view_matrix, 0, sphere_model_matrices[i], 0);
+        Matrix.multiplyMM(mvp_matrix, 0, projection_matrix, 0, temp_matrix, 0);
+
+        sphere_draw(
+          sphere_programs[i],
+          sphere_vertex_buffers[i],
+          sphere_index_buffers[i],
+          sphere_colors[i],
+          mvp_matrix);
+      }
+    }
+  });
+  return 0;
+}
+
+void print_info_at_console() {
+  api.addInfoLog("OpenGL ES Version: 3.2");
+  api.addInfoLog("Max cubes supported: " + CUBE_MAX_OBJECTS.toString());
+  api.addInfoLog("Max spheres supported: " + SPHERE_MAX_OBJECTS.toString());
+}
+
+api.lifecycleEvents.setOnCreate(new Event() {
+  public void onCallEvent() {
+    print_info_at_console();
+    main();
+  }
+});
+
+api.lifecycleEvents.setOnDestroy(new Event() {
+  public void onCallEvent() {
+    window_close();
+  }
+});
+
+// ------------- END MAIN ----------------

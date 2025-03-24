@@ -1,0 +1,223 @@
+/*
+ * Copyright 2025 Aquiles Trindade (trindadedev).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Sample Script.
+// Creates An Floating Window Game Mod-Menu Like.
+// @author Aquiles Trindade (trindadedev).
+
+import android.graphics.Color;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.GradientDrawable;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.CompoundButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
+import dev.trindadedev.tbsh.event.Event;
+import dev.trindadedev.tbsh.project.API;
+
+boolean aimLock = false;
+boolean aimBot = false;
+boolean aimBotScope = false;
+boolean aimBotCrouch = false;
+boolean aimVisibleCheck = false;
+boolean isRootViewAttached = false;
+
+// Root Layout for RootView
+final LinearLayout rootView = new LinearLayout(context);
+
+// Basic Infos for API
+api.project.setName("Floating Window");
+api.project.setDescription("An floating window like Game ModMenu Hack");
+api.project.setApiVersion(API.Version.One);
+api.project.setAuthor(
+  "Aquiles Trindade",
+  "trindadedev");
+
+// Creates an row with Linear, Text and Switch
+LinearLayout row(String text, CompoundButton.OnCheckedChangeListener listener) {
+  LinearLayout row = new LinearLayout(context);
+  row.setPadding(
+    20, // left
+    0, // top
+    20, // right
+    0); // bottom
+  TextView textView = new TextView(context);
+  textView.setText(text);
+  textView.setTextColor(Color.WHITE);
+  LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+  textParams.setMargins(
+    0, // left
+    0,// top
+    50, // right
+    0); // bottom
+  textView.setLayoutParams(textParams);
+  row.addView(textView);
+  MaterialSwitch sw = new MaterialSwitch(context);
+  sw.setOnCheckedChangeListener(listener);
+  row.addView(sw);
+  return row;
+}
+
+// Open the floating box.
+void openWindow() {
+  if (isRootViewAttached) return;
+  WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+      WindowManager.LayoutParams.WRAP_CONTENT,
+      WindowManager.LayoutParams.WRAP_CONTENT,
+      WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+      WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+      PixelFormat.TRANSLUCENT
+  );
+
+  params.gravity = Gravity.TOP | Gravity.LEFT;
+  api.getWindowManager().addView(rootView, params);
+  isRootViewAttached = true;
+  api.addTaskLog("Window opened.");
+}
+
+// Close the floating box.
+void closeWindow() {
+  if (api.getWindowManager() != null && isRootViewAttached) {
+    api.getWindowManager().removeViewImmediate(rootView);
+    isRootViewAttached = false;
+    api.addTaskLog("Window closed.");
+  }
+}
+
+// Main Method
+// Configures the box ui, logic and more...
+api.lifecycleEvents.setOnCreate(new Event() {
+  public void onCallEvent() {
+    GradientDrawable rootGd = new GradientDrawable();
+    rootGd.setColor(Color.BLACK);
+    rootGd.setCornerRadius(20);
+    rootView.setBackground(rootGd);
+    rootView.setOrientation(LinearLayout.VERTICAL);
+    rootView.setPadding(20, 20, 20, 20);
+
+    // Make floating window moveable by touch.
+    rootView.setOnTouchListener(new View.OnTouchListener() {
+      int initialX, initialY;
+      float initialTouchX, initialTouchY;
+
+      public boolean onTouch(View v, MotionEvent event) {
+        WindowManager.LayoutParams params = (WindowManager.LayoutParams) rootView.getLayoutParams();
+        switch (event.getAction()) {
+          case MotionEvent.ACTION_DOWN:
+            initialX = params.x;
+            initialY = params.y;
+            initialTouchX = event.getRawX();
+            initialTouchY = event.getRawY();
+            return true;
+          case MotionEvent.ACTION_MOVE:
+            params.x = initialX + (int) (event.getRawX() - initialTouchX);
+            params.y = initialY + (int) (event.getRawY() - initialTouchY);
+            api.getWindowManager().updateViewLayout(rootView, params);
+            return true;
+          }
+        return false;
+      }
+    });
+
+    rootView.addView(
+      row(
+        "Aim Lock",
+        new CompoundButton.OnCheckedChangeListener() {
+          public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            api.addTaskLog("AimLock: " + isChecked);
+            aimLock = isChecked;
+          }
+        }
+      )
+    );
+    rootView.addView(
+      row(
+        "Aim Bot",
+        new CompoundButton.OnCheckedChangeListener() {
+          public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            api.addTaskLog("AimBot: " + isChecked);
+            aimBot = isChecked;
+          }
+        }
+      )
+    );
+
+    rootView.addView(
+      row(
+        "Aim Bot Scope",
+        new CompoundButton.OnCheckedChangeListener() {
+          public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            api.addTaskLog("AimBotScope: " + isChecked);
+            aimBotScope = isChecked;
+          }
+        }
+      )
+    );
+
+    rootView.addView(
+      row(
+        "Aim Bot Crouch",
+        new CompoundButton.OnCheckedChangeListener() {
+          public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            api.addTaskLog("AimBotCrouch: " + isChecked);
+            aimBotCrouch = isChecked;
+          }
+        }
+      )
+    );
+
+    rootView.addView(
+      row(
+        "Aim Visible Check",
+        new CompoundButton.OnCheckedChangeListener() {
+          public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            api.addTaskLog("AimVisibleCheck: " + isChecked);
+            aimVisibleCheck = isChecked;
+          }
+        }
+      )
+    );
+    openWindow();
+  }
+});
+
+// Some Lifecycle events
+
+// Close the window when user fully close app or activity.
+api.lifecycleEvents.setOnDestroy(new Event() {
+  public void onCallEvent() {
+    closeWindow();
+  }
+});
+
+// Close the window when user pause app.
+api.lifecycleEvents.setOnPause(new Event() {
+  public void onCallEvent() {
+    closeWindow();
+  }
+});
+
+// Open the window when user back to the app.
+api.lifecycleEvents.setOnResume(new Event() {
+  public void onCallEvent() {
+    openWindow();
+  }
+});
