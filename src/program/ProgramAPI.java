@@ -25,7 +25,6 @@ import android.widget.Toast;
 import dev.trindadedev.bshrunner.RunnerActivity;
 import dev.trindadedev.bshrunner.event.Event;
 import dev.trindadedev.bshrunner.event.Events;
-import dev.trindadedev.bshrunner.gdx.LauncherActivity;
 
 public class ProgramAPI {
 
@@ -60,10 +59,6 @@ public class ProgramAPI {
 
   public void showToast(final String message) {
     Toast.makeText(context, message, 4000).show();
-  }
-
-  public void openThreeDimensionsActivity() {
-    context.startActivity(new Intent(context, LauncherActivity.class));
   }
 
   public void addTaskLog(final String log) {
