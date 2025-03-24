@@ -45,18 +45,21 @@ public class BSHGLRenderer implements GLSurfaceView.Renderer {
 
   public static class RendererEvents {
     // use default values for events to avoid crashes.
-    public OnSurfaceCreated onSurfaceCreated = new OnSurfaceCreated() {
-      @Override
-      public void onCallEvent(GL10 gl, EGLConfig config) { }
-    };
-    public OnSurfaceChanged onSurfaceChanged = new OnSurfaceChanged() {
-      @Override
-      public void onCallEvent(GL10 gl, int width, int height) { }
-    };
-    public OnDrawFrame onDrawFrame = new OnDrawFrame() {
-      @Override
-      public void onCallEvent(GL10 gl) { }
-    };
+    public OnSurfaceCreated onSurfaceCreated =
+        new OnSurfaceCreated() {
+          @Override
+          public void onCallEvent(GL10 gl, EGLConfig config) {}
+        };
+    public OnSurfaceChanged onSurfaceChanged =
+        new OnSurfaceChanged() {
+          @Override
+          public void onCallEvent(GL10 gl, int width, int height) {}
+        };
+    public OnDrawFrame onDrawFrame =
+        new OnDrawFrame() {
+          @Override
+          public void onCallEvent(GL10 gl) {}
+        };
 
     public void setOnSurfaceCreated(final OnSurfaceCreated onSurfaceCreated) {
       this.onSurfaceCreated = onSurfaceCreated;

@@ -103,11 +103,16 @@ public class ProgramInterpreter extends Interpreter {
     final String authorName = api.program.getAuthorName();
     final String authorUserName = api.program.getAuthorUserName();
 
-    if ((authorName == null || authorName.isEmpty()) && (authorUserName == null || authorUserName.isEmpty())) {
+    if ((authorName == null || authorName.isEmpty())
+        && (authorUserName == null || authorUserName.isEmpty())) {
       addWarningLog("Please provide Author Info");
     } else {
-      addInfoLog("Program Author: " + (authorName != null ? authorName : "N/A") 
-               + " (" + (authorUserName != null ? authorUserName : "N/A") + ")");
+      addInfoLog(
+          "Program Author: "
+              + (authorName != null ? authorName : "N/A")
+              + " ("
+              + (authorUserName != null ? authorUserName : "N/A")
+              + ")");
     }
   }
 

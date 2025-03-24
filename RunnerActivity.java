@@ -10,10 +10,10 @@ import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import java.io.File;
 import bsh.EvalError;
 import dev.trindadedev.bshrunner.databinding.RunnerBinding;
 import dev.trindadedev.bshrunner.program.ProgramInterpreter;
+import java.io.File;
 
 public class RunnerActivity extends AppCompatActivity {
 
@@ -32,7 +32,8 @@ public class RunnerActivity extends AppCompatActivity {
       if (programName == null) throw new EvalError("Program name is missing in intent extras.");
 
       final File programPath = new File(ProgramInterpreter.PROGRAMS_PATH, programName);
-      final ProgramInterpreter.InterpreterEvents interpreterEvents = new ProgramInterpreter.InterpreterEvents();
+      final ProgramInterpreter.InterpreterEvents interpreterEvents =
+          new ProgramInterpreter.InterpreterEvents();
 
       interpreterEvents.setOnLogAdded(this::updateLogsUI);
 
@@ -49,14 +50,17 @@ public class RunnerActivity extends AppCompatActivity {
     if (interpreter == null) return;
 
     binding.logsContent.removeAllViews();
-    interpreter.getLogs().forEach(log -> {
-      final TextView textView = new TextView(this);
-      textView.setText(log);
-      textView.setTextSize(16);
-      textView.setMaxLines(1);
-      textView.setEllipsize(TextUtils.TruncateAt.END);
-      binding.logsContent.addView(textView);
-    });
+    interpreter
+        .getLogs()
+        .forEach(
+            log -> {
+              final TextView textView = new TextView(this);
+              textView.setText(log);
+              textView.setTextSize(16);
+              textView.setMaxLines(1);
+              textView.setEllipsize(TextUtils.TruncateAt.END);
+              binding.logsContent.addView(textView);
+            });
   }
 
   private void showSelectableDialog(String message) {
@@ -69,12 +73,15 @@ public class RunnerActivity extends AppCompatActivity {
     new AlertDialog.Builder(this)
         .setTitle("Error")
         .setView(textView)
-        .setPositiveButton("Copy", (dialog, which) -> {
-          final ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-          final ClipData clip = ClipData.newPlainText("Copied", message);
-          clipboard.setPrimaryClip(clip);
-          Toast.makeText(this, "Copied!", Toast.LENGTH_SHORT).show();
-        })
+        .setPositiveButton(
+            "Copy",
+            (dialog, which) -> {
+              final ClipboardManager clipboard =
+                  (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+              final ClipData clip = ClipData.newPlainText("Copied", message);
+              clipboard.setPrimaryClip(clip);
+              Toast.makeText(this, "Copied!", Toast.LENGTH_SHORT).show();
+            })
         .setNegativeButton("Close", null)
         .show();
   }

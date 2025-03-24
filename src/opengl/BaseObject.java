@@ -16,6 +16,4 @@ package dev.trindadedev.bshrunner.opengl;
  * limitations under the License.
  */
 
-public interface BaseObject {
-
-}
+public interface BaseObject {}

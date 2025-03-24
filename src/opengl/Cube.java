@@ -16,11 +16,11 @@ package dev.trindadedev.bshrunner.opengl;
  * limitations under the License.
  */
 
+import android.opengl.GLES20;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
-import android.opengl.GLES20;
 
 public class Cube implements BaseObject {
   private final FloatBuffer vertexBuffer;
@@ -29,14 +29,8 @@ public class Cube implements BaseObject {
 
   private final int COORDS_PER_VERTEX = 3;
   private final float[] cubeCoords = {
-    -0.5f, 0.5f, 0.5f,
-    -0.5f, -0.5f, 0.5f,
-     0.5f, -0.5f, 0.5f,
-     0.5f, 0.5f, 0.5f,
-    -0.5f, 0.5f, -0.5f,
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f, 0.5f, -0.5f
+    -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f
   };
 
   // default colors for the cube vertices.
@@ -48,7 +42,7 @@ public class Cube implements BaseObject {
     1.0f, 1.0f, 1.0f, 1.0f, // white vertex 5
     1.0f, 1.0f, 1.0f, 1.0f, // white vertex 6
     1.0f, 1.0f, 1.0f, 1.0f, // white vertex 7
-    1.0f, 1.0f, 1.0f, 1.0f  // white vertex 8
+    1.0f, 1.0f, 1.0f, 1.0f // white vertex 8
   };
 
   private final short[] drawOrder = {
@@ -61,21 +55,21 @@ public class Cube implements BaseObject {
   };
 
   private final String vertexShaderCode =
-    "uniform mat4 uMVPMatrix;" +
-    "attribute vec4 vPosition;" +
-    "attribute vec4 vColor;" +
-    "varying vec4 vColorVarying;" +
-    "void main() {" +
-    "  gl_Position = uMVPMatrix * vPosition;" +
-    "  vColorVarying = vColor;" +
-    "}";
+      "uniform mat4 uMVPMatrix;"
+          + "attribute vec4 vPosition;"
+          + "attribute vec4 vColor;"
+          + "varying vec4 vColorVarying;"
+          + "void main() {"
+          + "  gl_Position = uMVPMatrix * vPosition;"
+          + "  vColorVarying = vColor;"
+          + "}";
 
   private final String fragmentShaderCode =
-    "precision mediump float;" +
-    "varying vec4 vColorVarying;" +
-    "void main() {" +
-    "  gl_FragColor = vColorVarying;" +
-    "}";
+      "precision mediump float;"
+          + "varying vec4 vColorVarying;"
+          + "void main() {"
+          + "  gl_FragColor = vColorVarying;"
+          + "}";
 
   public Cube() {
     // initialize vertex buffer
@@ -104,7 +98,8 @@ public class Cube implements BaseObject {
     // define vertex position
     int positionHandle = GLES20.glGetAttribLocation(program, "vPosition");
     GLES20.glEnableVertexAttribArray(positionHandle);
-    GLES20.glVertexAttribPointer(positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, 0, vertexBuffer);
+    GLES20.glVertexAttribPointer(
+        positionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT, false, 0, vertexBuffer);
 
     // define vertex color
     int colorHandle = GLES20.glGetAttribLocation(program, "vColor");
@@ -121,7 +116,8 @@ public class Cube implements BaseObject {
     ShortBuffer drawListBuffer = dlb.asShortBuffer();
     drawListBuffer.put(drawOrder);
     drawListBuffer.position(0);
-    GLES20.glDrawElements(GLES20.GL_TRIANGLES, drawOrder.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
+    GLES20.glDrawElements(
+        GLES20.GL_TRIANGLES, drawOrder.length, GLES20.GL_UNSIGNED_SHORT, drawListBuffer);
 
     // disable vertex attributes
     GLES20.glDisableVertexAttribArray(positionHandle);
