@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="Base.Theme.ELTrinity" parent="Theme.Material3.Light.NoActionBar">
+    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:windowLightNavigationBar">true</item>
+  </style>
+
+  <style name="Theme.ELTrinity" parent="Base.Theme.ELTrinity">
+    <item name="android:navigationBarColor">@android:color/transparent</item>
+    <item name="android:statusBarColor">@android:color/transparent</item>
+
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+    <item name="textInputStyle">@style/Widget.ELTrinity.TextInputLayout</item>
+    <item name="materialCardViewFilledStyle">@style/Widget.ELTrinity.MaterialCardView.Filled</item>
+  </style>
+</resources>
