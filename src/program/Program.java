@@ -20,6 +20,8 @@ public class Program {
   private String name;
   private String description;
   private ProgramAPI.Version apiVersion;
+  private String authorName;
+  private String authorUserName;
 
   public void setName(final String name) {
     this.name = name;
@@ -33,6 +35,11 @@ public class Program {
     this.apiVersion = apiVersion;
   }
 
+  public void setAuthor(final String authorName, final String authorUserName) {
+    this.authorName = authorName;
+    this.authorUserName = authorUserName;
+  }
+
   public String getName() {
     return name;
   }
@@ -43,5 +50,13 @@ public class Program {
 
   public ProgramAPI.Version getApiVersion() {
     return apiVersion;
+  }
+
+  public String getAuthorName() {
+    return authorName;
+  }
+
+  public String getAuthorUserName() {
+    return authorUserName;
   }
 }
