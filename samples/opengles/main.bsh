@@ -1,0 +1,131 @@
+/*
+ * Copyright 2025 Aquiles Trindade (trindadedev).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import android.opengl.GLES20;
+import android.opengl.Matrix;
+import dev.trindadedev.bshrunner.event.Event;
+import dev.trindadedev.bshrunner.program.ProgramAPI;
+import dev.trindadedev.bshrunner.opengl.BSHGLSurfaceView;
+import dev.trindadedev.bshrunner.opengl.BSHGLRenderer;
+import dev.trindadedev.bshrunner.opengl.BSHGLRenderer.RendererEvents;
+import dev.trindadedev.bshrunner.opengl.BaseObject;
+import dev.trindadedev.bshrunner.opengl.Cube;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
+float[] mMVPMatrix = new float[16];
+float[] mProjectionMatrix = new float[16];
+float[] mViewMatrix = new float[16];
+float[] mModelMatrix = new float[16];
+
+// program infos
+api.program.setName("OpenGL ES Testing");
+api.program.setDescription("Tests with OpenGL ES");
+api.program.setApiVersion(ProgramAPI.Version.One);
+api.program.setAuthor(
+  "Aquiles Trindade",
+  "trindadedev");
+
+// opengl es
+void openGles() {
+  float angle;
+  Cube cube1, cube2;
+  BSHGLSurfaceView surfaceView = new BSHGLSurfaceView(context);
+  BSHGLRenderer renderer = surfaceView.getRenderer();
+  float[] cube1Colors = {
+    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 1
+    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 2
+    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 3
+    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 4
+    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 5
+    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 6
+    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 7
+    1.0f, 0.0f, 0.0f, 1.0f  // red vertex 8
+  };
+
+  float[] cube2Colors = {
+    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 1
+    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 2
+    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 3
+    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 4
+    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 5
+    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 6
+    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 7
+    0.0f, 1.0f, 0.0f, 1.0f  // green vertex 8
+  };
+
+  renderer.events.setOnSurfaceCreated(new RendererEvents.OnSurfaceCreated() {
+    public void onCallEvent(GL10 gl, EGLConfig config) {
+      GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+      GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      cube1 = new Cube();
+      cube1.setColors(cube1Colors);
+      cube2 = new Cube();
+      cube2.setColors(cube2Colors);
+    }
+  });
+
+  renderer.events.setOnSurfaceChanged(new RendererEvents.OnSurfaceChanged() {
+    public void onCallEvent(GL10 gl, int width, int height) {
+      GLES20.glViewport(0, 0, width, height);
+      float ratio = (float) width / height;
+      Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 10);
+    }
+  });
+
+  renderer.events.setOnDrawFrame(new RendererEvents.OnDrawFrame() {
+    public void onCallEvent(GL10 gl) {
+      GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+      Matrix.setLookAtM(mViewMatrix, 0,
+          0f, 0f, -5f, // Camera position
+          0f, 0f, 0f,  // Look at origin
+          0f, 1f, 0f); // Up vector
+
+      // cube 1
+      Matrix.setIdentityM(mModelMatrix, 0);
+      Matrix.translateM(mModelMatrix, 0, -1.5f, 0f, 0f); // Move left
+      Matrix.rotateM(mModelMatrix, 0, angle, 1.0f, 0.5f, 0.0f);
+
+      float[] tempMatrix1 = new float[16];
+      Matrix.multiplyMM(tempMatrix1, 0, mViewMatrix, 0, mModelMatrix, 0);
+      Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix1, 0);
+
+      cube1.draw(mMVPMatrix);
+
+      // cube 2
+      Matrix.setIdentityM(mModelMatrix, 0);
+      Matrix.translateM(mModelMatrix, 0, 1.5f, 0f, 0f); // Move right
+      Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.5f);
+
+      float[] tempMatrix2 = new float[16];
+      Matrix.multiplyMM(tempMatrix2, 0, mViewMatrix, 0, mModelMatrix, 0);
+      Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix2, 0);
+
+      cube2.draw(mMVPMatrix);
+
+      angle += 1.0f;
+    }
+  });
+
+  api.addViewAtRoot(surfaceView);
+}
+
+api.lifecycleEvents.setOnCreate(new Event() {
+  public void onCallEvent() {
+    openGles();
+  }
+});
