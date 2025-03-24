@@ -47,6 +47,9 @@ final LinearLayout rootView = new LinearLayout(context);
 api.program.setName("Floating Window");
 api.program.setDescription("An floating window like Game ModMenu Hack");
 api.program.setApiVersion(ProgramAPI.Version.One);
+api.program.setAuthor(
+  "Aquiles Trindade",
+  "trindadedev");
 
 // Creates an row with Linear, Text and Switch
 LinearLayout row(String text, CompoundButton.OnCheckedChangeListener listener) {
