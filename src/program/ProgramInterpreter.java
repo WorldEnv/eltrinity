@@ -99,6 +99,16 @@ public class ProgramInterpreter extends Interpreter {
     } else {
       addInfoLog("Program API Version: " + api.program.getApiVersion().toString());
     }
+
+    final String authorName = api.program.getAuthorName();
+    final String authorUserName = api.program.getAuthorUserName();
+
+    if ((authorName == null || authorName.isEmpty()) && (authorUserName == null || authorUserName.isEmpty())) {
+      addWarningLog("Please provide Author Info");
+    } else {
+      addInfoLog("Program Author: " + (authorName != null ? authorName : "N/A") 
+               + " (" + (authorUserName != null ? authorUserName : "N/A") + ")");
+    }
   }
 
   /** Returns the main file of Program. */
