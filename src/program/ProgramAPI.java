@@ -82,6 +82,10 @@ public class ProgramAPI {
     if (interpreter != null) interpreter.addErrorLog(log);
   }
 
+  public void addInfoLog(final String log) {
+    if (interpreter != null) interpreter.addInfoLog(log);
+  }
+
   public WindowManager getWindowManager() {
     return (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
   }
