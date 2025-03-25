@@ -1,4 +1,4 @@
-package dev.trindadedev.bshrunner.opengl.objects;
+package dev.trindadedev.tbsh.opengl.objects;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).

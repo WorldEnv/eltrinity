@@ -1,4 +1,4 @@
-package dev.trindadedev.bshrunner.opengl.objects;
+package dev.trindadedev.tbsh.event;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -16,4 +16,11 @@ package dev.trindadedev.bshrunner.opengl.objects;
  * limitations under the License.
  */
 
-public interface BaseObject {}
+public abstract class Events {
+  protected final Event emptyEvent() {
+    return new Event() {
+      @Override
+      public void onCallEvent() {}
+    };
+  }
+}

@@ -1,4 +1,4 @@
-package dev.trindadedev.bshrunner.opengl.objects;
+package dev.trindadedev.tbsh.opengl.objects;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-public class Triangle {
+public class Triangle implements BaseObject {
   private static final int COORDS_PER_VERTEX = 3;
   private final FloatBuffer vertexBuffer;
   private final int program;

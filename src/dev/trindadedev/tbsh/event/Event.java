@@ -1,4 +1,4 @@
-package dev.trindadedev.bshrunner.event;
+package dev.trindadedev.tbsh.event;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).

@@ -16,14 +16,14 @@
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import dev.trindadedev.bshrunner.event.Event;
-import dev.trindadedev.bshrunner.program.ProgramAPI;
-import dev.trindadedev.bshrunner.opengl.BSHGLSurfaceView;
-import dev.trindadedev.bshrunner.opengl.BSHGLRenderer;
-import dev.trindadedev.bshrunner.opengl.BSHGLRenderer.RendererEvents;
-import dev.trindadedev.bshrunner.opengl.objects.Circle;
-import dev.trindadedev.bshrunner.opengl.objects.Cube;
-import dev.trindadedev.bshrunner.opengl.objects.Triangle;
+import dev.trindadedev.tbsh.event.Event;
+import dev.trindadedev.tbsh.project.API;
+import dev.trindadedev.tbsh.opengl.BSHGLSurfaceView;
+import dev.trindadedev.tbsh.opengl.BSHGLRenderer;
+import dev.trindadedev.tbsh.opengl.BSHGLRenderer.RendererEvents;
+import dev.trindadedev.tbsh.opengl.objects.Circle;
+import dev.trindadedev.tbsh.opengl.objects.Cube;
+import dev.trindadedev.tbsh.opengl.objects.Triangle;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -35,11 +35,11 @@ float[] mProjectionMatrix = new float[16];
 float[] mViewMatrix = new float[16];
 float[] mModelMatrix = new float[16];
 
-// program infos
-api.program.setName("OpenGL ES Testing");
-api.program.setDescription("Tests with OpenGL ES");
-api.program.setApiVersion(ProgramAPI.Version.One);
-api.program.setAuthor(
+// project infos
+api.project.setName("OpenGL ES Testing");
+api.project.setDescription("Tests with OpenGL ES");
+api.project.setApiVersion(API.Version.One);
+api.project.setAuthor(
   "Aquiles Trindade",
   "trindadedev");
 

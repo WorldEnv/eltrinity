@@ -1,4 +1,4 @@
-package dev.trindadedev.bshrunner.program;
+package dev.trindadedev.tbsh.project;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -16,10 +16,10 @@ package dev.trindadedev.bshrunner.program;
  * limitations under the License.
  */
 
-public class Program {
+public class Project {
   private String name;
   private String description;
-  private ProgramAPI.Version apiVersion;
+  private API.Version apiVersion;
   private String authorName;
   private String authorUserName;
 
@@ -31,7 +31,7 @@ public class Program {
     this.description = description;
   }
 
-  public void setApiVersion(final ProgramAPI.Version apiVersion) {
+  public void setApiVersion(final API.Version apiVersion) {
     this.apiVersion = apiVersion;
   }
 
@@ -48,7 +48,7 @@ public class Program {
     return description;
   }
 
-  public ProgramAPI.Version getApiVersion() {
+  public API.Version getApiVersion() {
     return apiVersion;
   }
 

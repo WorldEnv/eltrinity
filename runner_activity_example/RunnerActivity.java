@@ -25,16 +25,38 @@ import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
+import android.view.ViewGroup;
+import androidx.annotation.NonNull;
 import bsh.EvalError;
 import dev.trindadedev.bshrunner.databinding.RunnerBinding;
-import dev.trindadedev.bshrunner.program.ProgramInterpreter;
+import dev.trindadedev.tbsh.app.TBSHActivity;
+import dev.trindadedev.tbsh.project.TBSHInterpreter;
 import java.io.File;
 
-public class RunnerActivity extends AppCompatActivity {
+public class RunnerActivity extends TBSHActivity {
 
   private RunnerBinding binding;
-  private ProgramInterpreter interpreter;
+  private TBSHInterpreter interpreter;
+  
+  @Override
+  @NonNull
+  protected TBSHInterpreter getInterpreter() {
+    
+    if (interpreter == null) {
+      try {
+        interpreter = new TBSHInterpreter(this);
+      } catch (EvalError exc) {
+        showErrorDialog(exc.toString());
+      }
+    }
+    return interpreter;
+  }
+
+  @Override
+  @NonNull
+  public ViewGroup getRootViewForApi() {
+    return binding.content;
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -43,26 +65,25 @@ public class RunnerActivity extends AppCompatActivity {
     setContentView(binding.getRoot());
 
     try {
-      final String programName = getIntent().getStringExtra("program_name");
+      final String projectName = getIntent().getStringExtra("project_name");
+      final File projectPath = new File(TBSHInterpreter.PROJECTS_PATH, projectName);
 
-      if (programName == null) throw new EvalError("Program name is missing in intent extras.");
-
-      final File programPath = new File(ProgramInterpreter.PROGRAMS_PATH, programName);
-      final ProgramInterpreter.InterpreterEvents interpreterEvents =
-          new ProgramInterpreter.InterpreterEvents();
+      final TBSHInterpreter.InterpreterEvents interpreterEvents =
+          new TBSHInterpreter.InterpreterEvents();
 
       interpreterEvents.setOnLogAdded(this::updateLogsUI);
 
-      interpreter = new ProgramInterpreter(this, programPath, interpreterEvents);
-      interpreter.runProgramMain();
-      interpreter.getProgramLifecycleEvents().onCreate.onCallEvent();
+      interpreter.setProjectPath(projectPath);
+      interpreter.setEvents(interpreterEvents);
+      interpreter.runProjectMain();
+      interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
 
     } catch (EvalError e) {
-      showSelectableDialog("Error: " + e.getMessage());
+      showErrorDialog("Error: " + e.getMessage());
     }
   }
 
-  private void updateLogsUI() {
+  private final void updateLogsUI() {
     if (interpreter == null) return;
 
     binding.logsContent.removeAllViews();
@@ -79,7 +100,7 @@ public class RunnerActivity extends AppCompatActivity {
             });
   }
 
-  private void showSelectableDialog(String message) {
+  private final void showErrorDialog(String message) {
     final TextView textView = new TextView(this);
     textView.setText(message);
     textView.setTextIsSelectable(true);
@@ -100,41 +121,5 @@ public class RunnerActivity extends AppCompatActivity {
             })
         .setNegativeButton("Close", null)
         .show();
-  }
-
-  @Override
-  protected void onDestroy() {
-    super.onDestroy();
-    if (interpreter != null) interpreter.getProgramLifecycleEvents().onDestroy.onCallEvent();
-  }
-
-  @Override
-  protected void onResume() {
-    super.onResume();
-    if (interpreter != null) interpreter.getProgramLifecycleEvents().onResume.onCallEvent();
-  }
-
-  @Override
-  protected void onStart() {
-    super.onStart();
-    if (interpreter != null) interpreter.getProgramLifecycleEvents().onStart.onCallEvent();
-  }
-
-  @Override
-  protected void onPause() {
-    super.onPause();
-    if (interpreter != null) interpreter.getProgramLifecycleEvents().onPause.onCallEvent();
-  }
-
-  @Override
-  protected void onStop() {
-    super.onStop();
-    if (interpreter != null) interpreter.getProgramLifecycleEvents().onStop.onCallEvent();
-  }
-
-  @Override
-  protected void onPostCreate(Bundle savedInstanceState) {
-    super.onPostCreate(savedInstanceState);
-    if (interpreter != null) interpreter.getProgramLifecycleEvents().onPostCreate.onCallEvent();
   }
 }

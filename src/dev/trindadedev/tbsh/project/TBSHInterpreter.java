@@ -1,4 +1,4 @@
-package dev.trindadedev.bshrunner.program;
+package dev.trindadedev.tbsh.project;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -19,16 +19,16 @@ package dev.trindadedev.bshrunner.program;
 import android.content.Context;
 import bsh.EvalError;
 import bsh.Interpreter;
-import dev.trindadedev.bshrunner.event.Event;
-import dev.trindadedev.bshrunner.event.Events;
-import dev.trindadedev.bshrunner.util.FileUtil;
+import dev.trindadedev.tbsh.event.Event;
+import dev.trindadedev.tbsh.event.Events;
+import dev.trindadedev.tbsh.util.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProgramInterpreter extends Interpreter {
+public class TBSHInterpreter extends Interpreter {
 
-  public static final String PROGRAMS_PATH = "/sdcard/bsh";
+  public static final String PROJECTS_PATH = "/sdcard/bsh";
 
   private static final String LOG_TASK = "[TASK]";
   private static final String LOG_SUCCESS = "[SUCCESS]";
@@ -39,76 +39,94 @@ public class ProgramInterpreter extends Interpreter {
   public InterpreterEvents events;
 
   protected Context context;
-  protected File programPath;
+  protected File projectPath;
   protected List<String> logs;
-  protected ProgramAPI api;
+  protected API api;
 
-  public ProgramInterpreter(final Context context, final File programPath) throws EvalError {
-    this(context, programPath, new InterpreterEvents());
-  }
-
-  public ProgramInterpreter(final Context context, final File programPath, InterpreterEvents events)
-      throws EvalError {
+  public TBSHInterpreter(final Context context) throws EvalError {
     super();
-    this.programPath = programPath;
     this.context = context;
     this.logs = new ArrayList<>();
-    this.api = new ProgramAPI(context, this);
-    this.events = events;
+    this.events = new InterpreterEvents();
+    this.api = new API(context, this);
     configureVariables();
-    addTaskLog("Environment variables defined.");
+  }
+
+  public TBSHInterpreter(final Context context, final File projectPath) throws EvalError {
+    this(context, projectPath, new InterpreterEvents());
+  }
+
+  public TBSHInterpreter(final Context context, final File projectPath, InterpreterEvents events)
+      throws EvalError {
+    this(context);
+    setProjectPath(projectPath);
+    setEvents(events);
+  }
+
+  public void setProjectPath(File projectPath) {
+    this.projectPath = projectPath;
+  }
+
+  public void setEvents(InterpreterEvents events) {
+    this.events = events;
   }
 
   private void configureVariables() throws EvalError {
-    set("programPath", programPath);
+    set("projectPath", projectPath);
     set("context", context);
     set("api", api);
+    addTaskLog("Environment variables defined.");
   }
 
-  /** Compiles the main file of Program. */
-  public void runProgramMain() throws EvalError {
-    if (!getProgramMainFile().exists()) {
-      addErrorLog("Program main.bsh File Not Exists!\n");
+  /** Compiles the main file of Project. */
+  public void runProjectMain() throws EvalError {
+    if (projectPath == null) {
+      addErrorLog("Project path is not set!");
       return;
     }
 
-    final var programMainContent = FileUtil.readFile(getProgramMainFile());
-
-    if (programMainContent.isEmpty()) {
-      addErrorLog("Empty Program main.bsh File!\n");
+    if (!getProjectMainFile().exists()) {
+      addErrorLog("Project main.bsh File Not Exists!\n");
       return;
     }
-    eval(programMainContent);
 
-    addSuccessLog("Compiled with success!");
+    final String projectMainContent = FileUtil.readFile(getProjectMainFile());
 
-    if (api.program.getName() == null || api.program.getName().isEmpty()) {
-      addWarningLog("Please provide Program Name");
+    if (projectMainContent.isEmpty()) {
+      addErrorLog("Empty Project main.bsh File!\n");
+      return;
+    }
+    eval(projectMainContent);
+
+    addSuccessLog("Compiled successfully!");
+
+    if (api.project.getName() == null || api.project.getName().isEmpty()) {
+      addWarningLog("Please provide Project Name");
     } else {
-      addInfoLog("Running " + api.program.getName() + "...");
+      addInfoLog("Running " + api.project.getName() + "...");
     }
 
-    if (api.program.getDescription() == null || api.program.getDescription().isEmpty()) {
-      addWarningLog("Please provide Program Description");
+    if (api.project.getDescription() == null || api.project.getDescription().isEmpty()) {
+      addWarningLog("Please provide Project Description");
     } else {
-      addInfoLog("Program Description: " + api.program.getDescription());
+      addInfoLog("Project Description: " + api.project.getDescription());
     }
 
-    if (api.program.getApiVersion() == null) {
-      addWarningLog("Please declare the api version of your program");
+    if (api.project.getApiVersion() == null) {
+      addWarningLog("Please declare the API version of your project");
     } else {
-      addInfoLog("Program API Version: " + api.program.getApiVersion().toString());
+      addInfoLog("Project API Version: " + api.project.getApiVersion().toString());
     }
 
-    final String authorName = api.program.getAuthorName();
-    final String authorUserName = api.program.getAuthorUserName();
+    final String authorName = api.project.getAuthorName();
+    final String authorUserName = api.project.getAuthorUserName();
 
     if ((authorName == null || authorName.isEmpty())
         && (authorUserName == null || authorUserName.isEmpty())) {
       addWarningLog("Please provide Author Info");
     } else {
       addInfoLog(
-          "Program Author: "
+          "Project Author: "
               + (authorName != null ? authorName : "N/A")
               + " ("
               + (authorUserName != null ? authorUserName : "N/A")
@@ -116,9 +134,9 @@ public class ProgramInterpreter extends Interpreter {
     }
   }
 
-  /** Returns the main file of Program. */
-  public File getProgramMainFile() {
-    return new File(programPath, "main.bsh");
+  /** Returns the main file of Project. */
+  public File getProjectMainFile() {
+    return new File(projectPath, "main.bsh");
   }
 
   public List<String> getLogs() {
@@ -150,7 +168,11 @@ public class ProgramInterpreter extends Interpreter {
     events.onLogAdded.onCallEvent();
   }
 
-  public ProgramAPI.LifecycleEvents getProgramLifecycleEvents() {
+  public API getAPI() {
+    return api;
+  }
+
+  public API.LifecycleEvents getProjectLifecycleEvents() {
     return api.lifecycleEvents;
   }
 

@@ -1,4 +1,4 @@
-package dev.trindadedev.bshrunner.util;
+package dev.trindadedev.tbsh.util;
 
 import java.io.*;
 

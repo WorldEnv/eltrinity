@@ -1,4 +1,4 @@
-package dev.trindadedev.bshrunner.program;
+package dev.trindadedev.tbsh.project;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -19,40 +19,45 @@ package dev.trindadedev.bshrunner.program;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
-import dev.trindadedev.bshrunner.RunnerActivity;
-import dev.trindadedev.bshrunner.event.Event;
-import dev.trindadedev.bshrunner.event.Events;
+import dev.trindadedev.tbsh.app.TBSHActivity;
+import dev.trindadedev.tbsh.event.Event;
+import dev.trindadedev.tbsh.event.Events;
 
-public class ProgramAPI {
+public class API {
 
-  public Program program;
+  public Project project;
   public LifecycleEvents lifecycleEvents;
 
-  private ProgramInterpreter interpreter;
+  private TBSHInterpreter interpreter;
   private Context context;
 
-  public ProgramAPI(final Context context) {
+  public API(final Context context) {
     this.context = context;
-    this.program = new Program();
+    this.project = new Project();
     this.lifecycleEvents = new LifecycleEvents();
   }
 
-  public ProgramAPI(final Context context, ProgramInterpreter interpreter) {
+  public API(final Context context, final TBSHInterpreter interpreter) {
     this(context);
     this.interpreter = interpreter;
   }
 
-  public RunnerActivity contextAsRunnerActivity() {
-    if (context instanceof RunnerActivity) {
-      return (RunnerActivity) context;
+  public TBSHActivity contextAsTBSHActivity() {
+    if (context instanceof TBSHActivity) {
+      return (TBSHActivity) context;
     }
-    throw new IllegalStateException("ProgramAPI Must be instantiated by RunnerActivity.");
+    throw new IllegalStateException("API Must be instantiated by TBSHActivity.");
   }
 
   public void addViewAtRoot(final View view) {
-    final var rootView = contextAsRunnerActivity().binding.content;
+    final ViewGroup rootView = contextAsTBSHActivity().getRootViewForApi();
+    if (rootView == null) {
+      addErrorLog("Failed to add view: Root view of TBSHActivity is not initialized.");
+      return;
+    }
     rootView.addView(view);
   }
 
