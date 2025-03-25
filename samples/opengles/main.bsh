@@ -21,7 +21,9 @@ import dev.trindadedev.bshrunner.program.ProgramAPI;
 import dev.trindadedev.bshrunner.opengl.BSHGLSurfaceView;
 import dev.trindadedev.bshrunner.opengl.BSHGLRenderer;
 import dev.trindadedev.bshrunner.opengl.BSHGLRenderer.RendererEvents;
+import dev.trindadedev.bshrunner.opengl.objects.Circle;
 import dev.trindadedev.bshrunner.opengl.objects.Cube;
+import dev.trindadedev.bshrunner.opengl.objects.Triangle;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -45,6 +47,8 @@ api.program.setAuthor(
 void openGles() {
   float angle;
   Cube blueCube, yellowCube, pinkCube;
+  Circle blueCircle;
+  Triangle blueTriangle;
   BSHGLSurfaceView surfaceView = new BSHGLSurfaceView(context);
   BSHGLRenderer renderer = surfaceView.getRenderer();
   float[] blueCubeColors = {
@@ -87,9 +91,17 @@ void openGles() {
       blueCube = new Cube();
       yellowCube = new Cube();
       pinkCube = new Cube();
+      blueCircle = new Circle(0.5f, 40);
+      blueTriangle = new Triangle();
       blueCube.setColors(blueCubeColors);
       yellowCube.setColors(yellowCubeColors);
       pinkCube.setColors(pinkCubeColors);
+      blueCircle.setColor(new float[] {
+        0.0f, 1.0f, 0.0f, 1.0f
+      });
+      blueTriangle.setColor(new float[] {
+        1.0f, 0.0f, 1.0f, 1.0f
+      });
     }
   });
 
@@ -110,57 +122,105 @@ void openGles() {
           0f, 0f, 0f,  // Look at origin
           0f, 1f, 0f); // Up vector
 
-      // blue cube
-      Matrix.setIdentityM(mModelMatrix, 0);
-      Matrix.translateM(
-          mModelMatrix, // matrix
-          0,  // index into m where the matrix starts
-          1.5f,  // x
-          1.5f,  // y
-          0f  // z
-          ); // Move right
-      Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
+      // cubes
+      {
+        // blue cube
+        {
+          Matrix.setIdentityM(mModelMatrix, 0);
+          Matrix.translateM(
+              mModelMatrix, // matrix
+              0,  // index into m where the matrix starts
+              1.5f,  // x
+              1.5f,  // y
+              0f  // z
+              ); // Move right
+          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
 
-      float[] tempMatrix1 = new float[16];
-      Matrix.multiplyMM(tempMatrix1, 0, mViewMatrix, 0, mModelMatrix, 0);
-      Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix1, 0);
+          float[] tempMatrix = new float[16];
+          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
 
-      blueCube.draw(mMVPMatrix);
+          blueCube.draw(mMVPMatrix);
+        }
 
-      // yellow cube
-      Matrix.setIdentityM(mModelMatrix, 0);
-      Matrix.translateM(
-          mModelMatrix, // matrix
-          0,  // index into m where the matrix starts
-          1.5f,  // x
-          0f,  // y
-          0f  // z
-          ); // Move right
-      Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
+        // yellow cube
+        {
+          Matrix.setIdentityM(mModelMatrix, 0);
+          Matrix.translateM(
+              mModelMatrix, // matrix
+              0,  // index into m where the matrix starts
+              1.5f,  // x
+              0f,  // y
+              0f  // z
+              ); // Move right
+          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
 
-      float[] tempMatrix2 = new float[16];
-      Matrix.multiplyMM(tempMatrix2, 0, mViewMatrix, 0, mModelMatrix, 0);
-      Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix2, 0);
+          float[] tempMatrix = new float[16];
+          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
 
-      yellowCube.draw(mMVPMatrix);
+          yellowCube.draw(mMVPMatrix);
+        }
 
-      // pink cube
-      Matrix.setIdentityM(mModelMatrix, 0);
-      Matrix.translateM(
-          mModelMatrix, // matrix
-          0,  // index into m where the matrix starts
-          1.5f,  // x
-          -1.5f,  // y
-          0f  // z
-          ); // Move right
-      Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
+        // pink cube
+        {
+          Matrix.setIdentityM(mModelMatrix, 0);
+          Matrix.translateM(
+              mModelMatrix, // matrix
+              0,  // index into m where the matrix starts
+              1.5f,  // x
+              -1.5f,  // y
+              0f  // z
+              ); // Move right
+          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
 
-      float[] tempMatrix3 = new float[16];
-      Matrix.multiplyMM(tempMatrix3, 0, mViewMatrix, 0, mModelMatrix, 0);
-      Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix3, 0);
+          float[] tempMatrix = new float[16];
+          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
 
-      pinkCube.draw(mMVPMatrix);
+          pinkCube.draw(mMVPMatrix);
+        }
+      }
+      // circles
+      {
+        // blue circle
+        {
+          Matrix.setIdentityM(mModelMatrix, 0);
+          Matrix.translateM(
+              mModelMatrix, // matrix
+              0,  // index into m where the matrix starts
+              -1.5f,  // x
+              0,  // y
+              0f  // z
+              ); // Move right
+          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
 
+          float[] tempMatrix = new float[16];
+          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
+          blueCircle.draw(mMVPMatrix);
+        }
+      }
+      // triangles
+      {
+        // blue triangle
+        {
+          Matrix.setIdentityM(mModelMatrix, 0);
+          Matrix.translateM(
+              mModelMatrix, // matrix
+              0,  // index into m where the matrix starts
+              0,  // x
+              0,  // y
+              0f  // z
+              ); // Move right
+          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
+
+          float[] tempMatrix = new float[16];
+          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
+          blueTriangle.draw(mMVPMatrix);
+        }
+      }
       angle += 1.0f;
     }
   });
