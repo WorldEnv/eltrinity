@@ -23,6 +23,9 @@ import dev.trindadedev.bshrunner.opengl.BSHGLRenderer;
 import dev.trindadedev.bshrunner.opengl.BSHGLRenderer.RendererEvents;
 import dev.trindadedev.bshrunner.opengl.BaseObject;
 import dev.trindadedev.bshrunner.opengl.Cube;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -42,39 +45,52 @@ api.program.setAuthor(
 // opengl es
 void openGles() {
   float angle;
-  Cube cube1, cube2;
+  Cube blueCube, yellowCube, pinkCube;
   BSHGLSurfaceView surfaceView = new BSHGLSurfaceView(context);
   BSHGLRenderer renderer = surfaceView.getRenderer();
-  float[] cube1Colors = {
-    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 1
-    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 2
-    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 3
-    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 4
-    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 5
-    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 6
-    1.0f, 0.0f, 0.0f, 1.0f, // red vertex 7
-    1.0f, 0.0f, 0.0f, 1.0f  // red vertex 8
+  float[] blueCubeColors = {
+    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 1
+    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 2
+    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 3
+    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 1
+    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 2
+    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 6
+    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 2
+    0.0f, 0.0f, 1.0f, 1.0f  // red vertex 8
   };
 
-  float[] cube2Colors = {
-    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 1
-    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 2
-    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 3
-    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 4
-    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 5
-    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 6
-    0.0f, 1.0f, 0.0f, 1.0f, // green vertex 7
-    0.0f, 1.0f, 0.0f, 1.0f  // green vertex 8
+  float[] yellowCubeColors = {
+    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 1
+    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 2
+    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 3
+    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 4
+    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 5
+    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 6
+    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 7
+    1.0f, 1.0f, 0.0f, 1.0f  // yellow vertex 8
+  };
+
+  float[] pinkCubeColors = {
+    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 1
+    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 2
+    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 3
+    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 4
+    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 5
+    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 6
+    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 7
+    1.0f, 0.0f, 1.0f, 1.0f  // pink vertex 8
   };
 
   renderer.events.setOnSurfaceCreated(new RendererEvents.OnSurfaceCreated() {
     public void onCallEvent(GL10 gl, EGLConfig config) {
       GLES20.glEnable(GLES20.GL_DEPTH_TEST);
       GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-      cube1 = new Cube();
-      cube1.setColors(cube1Colors);
-      cube2 = new Cube();
-      cube2.setColors(cube2Colors);
+      blueCube = new Cube();
+      yellowCube = new Cube();
+      pinkCube = new Cube();
+      blueCube.setColors(blueCubeColors);
+      yellowCube.setColors(yellowCubeColors);
+      pinkCube.setColors(pinkCubeColors);
     }
   });
 
@@ -95,27 +111,56 @@ void openGles() {
           0f, 0f, 0f,  // Look at origin
           0f, 1f, 0f); // Up vector
 
-      // cube 1
+      // blue cube
       Matrix.setIdentityM(mModelMatrix, 0);
-      Matrix.translateM(mModelMatrix, 0, -1.5f, 0f, 0f); // Move left
-      Matrix.rotateM(mModelMatrix, 0, angle, 1.0f, 0.5f, 0.0f);
+      Matrix.translateM(
+          mModelMatrix, // matrix
+          0,  // index into m where the matrix starts
+          1.5f,  // x
+          1.5f,  // y
+          0f  // z
+          ); // Move right
+      Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
 
       float[] tempMatrix1 = new float[16];
       Matrix.multiplyMM(tempMatrix1, 0, mViewMatrix, 0, mModelMatrix, 0);
       Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix1, 0);
 
-      cube1.draw(mMVPMatrix);
+      blueCube.draw(mMVPMatrix);
 
-      // cube 2
+      // yellow cube
       Matrix.setIdentityM(mModelMatrix, 0);
-      Matrix.translateM(mModelMatrix, 0, 1.5f, 0f, 0f); // Move right
-      Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.5f);
+      Matrix.translateM(
+          mModelMatrix, // matrix
+          0,  // index into m where the matrix starts
+          1.5f,  // x
+          0f,  // y
+          0f  // z
+          ); // Move right
+      Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
 
       float[] tempMatrix2 = new float[16];
       Matrix.multiplyMM(tempMatrix2, 0, mViewMatrix, 0, mModelMatrix, 0);
       Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix2, 0);
 
-      cube2.draw(mMVPMatrix);
+      yellowCube.draw(mMVPMatrix);
+
+      // pink cube
+      Matrix.setIdentityM(mModelMatrix, 0);
+      Matrix.translateM(
+          mModelMatrix, // matrix
+          0,  // index into m where the matrix starts
+          1.5f,  // x
+          -1.5f,  // y
+          0f  // z
+          ); // Move right
+      Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
+
+      float[] tempMatrix3 = new float[16];
+      Matrix.multiplyMM(tempMatrix3, 0, mViewMatrix, 0, mModelMatrix, 0);
+      Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix3, 0);
+
+      pinkCube.draw(mMVPMatrix);
 
       angle += 1.0f;
     }
