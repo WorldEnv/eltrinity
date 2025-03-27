@@ -1,6 +1,9 @@
 # BeanShell Runner
 - Run BeanShell Easily with total access to the app.
 
+# Dowwnload app
+- Download the latest apk [here](https://github.com/trindadedev13/BSH-Runner/tree/main/builds/apk)
+  
 # How to run
 - Put classes & libs in your android app project.
 - Implement the main class (ProgramInterpreter) in your project.
