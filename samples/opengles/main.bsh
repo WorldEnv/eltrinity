@@ -14,222 +14,433 @@
  * limitations under the License.
  */
 
-import android.opengl.GLES20;
+import android.opengl.GLES32;
 import android.opengl.Matrix;
+import android.view.MotionEvent;
+import android.view.View;
 import dev.trindadedev.tbsh.event.Event;
-import dev.trindadedev.tbsh.project.API;
+import dev.trindadedev.tbsh.project.API.Version;
+import dev.trindadedev.tbsh.util.FileUtil;
 import dev.trindadedev.tbsh.opengl.BSHGLSurfaceView;
 import dev.trindadedev.tbsh.opengl.BSHGLRenderer;
 import dev.trindadedev.tbsh.opengl.BSHGLRenderer.RendererEvents;
-import dev.trindadedev.tbsh.opengl.objects.Circle;
-import dev.trindadedev.tbsh.opengl.objects.Cube;
-import dev.trindadedev.tbsh.opengl.objects.Triangle;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-
-float[] mMVPMatrix = new float[16];
-float[] mProjectionMatrix = new float[16];
-float[] mViewMatrix = new float[16];
-float[] mModelMatrix = new float[16];
 
 // project infos
 api.project.setName("OpenGL ES Testing");
 api.project.setDescription("Tests with OpenGL ES");
-api.project.setApiVersion(API.Version.One);
+api.project.setApiVersion(Version.One);
 api.project.setAuthor(
   "Aquiles Trindade",
   "trindadedev");
 
-// opengl es
-void openGles() {
-  float angle;
-  Cube blueCube, yellowCube, pinkCube;
-  Circle blueCircle;
-  Triangle blueTriangle;
-  BSHGLSurfaceView surfaceView = new BSHGLSurfaceView(context);
-  BSHGLRenderer renderer = surfaceView.getRenderer();
-  float[] blueCubeColors = {
-    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 1
-    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 2
-    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 3
-    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 1
-    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 2
-    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 6
-    0.0f, 0.0f, 1.0f, 1.0f, // red vertex 2
-    0.0f, 0.0f, 1.0f, 1.0f  // red vertex 8
-  };
+// the root folder of the project.
+// used for map shaders and more
+// change this to the folder directory where this file is
+final File projectFile = new File("/sdcard/bsh/opengles");
 
-  float[] yellowCubeColors = {
-    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 1
-    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 2
-    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 3
-    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 4
-    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 5
-    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 6
-    1.0f, 1.0f, 0.0f, 1.0f, // yellow vertex 7
-    1.0f, 1.0f, 0.0f, 1.0f  // yellow vertex 8
-  };
+// ------------- UTILS -----------
 
-  float[] pinkCubeColors = {
-    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 1
-    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 2
-    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 3
-    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 4
-    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 5
-    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 6
-    1.0f, 0.0f, 1.0f, 1.0f, // pink vertex 7
-    1.0f, 0.0f, 1.0f, 1.0f  // pink vertex 8
-  };
+// loads an glsl shader
+int load_shader(int type, String shader_code) {
+  int shader = GLES32.glCreateShader(type);
+  GLES32.glShaderSource(shader, shader_code);
+  GLES32.glCompileShader(shader);
+  return shader;
+}
+
+// ------------ END UTILS --------
+
+final int COORDS_PER_VERTEX = 3;
+
+// ------------- CUBE -----------
+
+final int CUBE_MAX_OBJECTS = 24; // max cubes supported in scene
+int total_cubes_count = 0; // current cubes diplayed count
+
+final FloatBuffer[] cube_vertex_buffers = new FloatBuffer[CUBE_MAX_OBJECTS];
+final FloatBuffer[] cube_color_buffers = new FloatBuffer[CUBE_MAX_OBJECTS];
+final ShortBuffer[] cube_draw_list_buffers = new ShortBuffer[CUBE_MAX_OBJECTS];
+
+final int[] cube_programs = new int[CUBE_MAX_OBJECTS];
+
+final float[][] cube_model_matrices = new float[CUBE_MAX_OBJECTS][16];
+
+final float[] cube_coords = {
+  -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f,
+  -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f
+};
+
+final short[] cube_draw_order = {
+  0, 1, 2, 0, 2, 3,
+  4, 5, 6, 4, 6, 7,
+  0, 1, 5, 0, 5, 4,
+  2, 3, 7, 2, 7, 6,
+  0, 3, 7, 0, 7, 4,
+  1, 2, 6, 1, 6, 5
+};
+
+void cube_create(float[] colors) {
+  if (total_cubes_count >= CUBE_MAX_OBJECTS) {
+    context.runOnUiThread(new Runnable() {
+      public void run() {
+        api.addErrorLog("Cube limit reached. Increase it before add new cube.");
+      }
+    });
+    return;
+  }
+
+  final int index = total_cubes_count;
+
+  // buffers
+  final ByteBuffer bb = ByteBuffer.allocateDirect(cube_coords.length * 4); // 4 bytes per float
+  bb.order(ByteOrder.nativeOrder());
+  cube_vertex_buffers[index] = bb.asFloatBuffer();
+  cube_vertex_buffers[index].put(cube_coords);
+  cube_vertex_buffers[index].position(0);
+
+  final ByteBuffer cb = ByteBuffer.allocateDirect(colors.length * 4); // 4 bytes per float
+  cb.order(ByteOrder.nativeOrder());
+  cube_color_buffers[index] = cb.asFloatBuffer();
+  cube_color_buffers[index].put(colors);
+  cube_color_buffers[index].position(0);
+
+  final ByteBuffer dlb = ByteBuffer.allocateDirect(cube_draw_order.length * 2); // 2 bytes per shot
+  dlb.order(ByteOrder.nativeOrder());
+  cube_draw_list_buffers[index] = dlb.asShortBuffer();
+  cube_draw_list_buffers[index].put(cube_draw_order);
+  cube_draw_list_buffers[index].position(0);
+
+  // reads shaders from shaders/cube folder.
+  final String vertex_shader_code = FileUtil.readFile(new File(projectFile, "shaders/cube/vertex_shader.vert"));
+  final String fragment_shader_code = FileUtil.readFile(new File(projectFile, "shaders/cube/fragment_shader.frag"));
+  final int vertex_shader = load_shader(GLES32.GL_VERTEX_SHADER, vertex_shader_code);
+  final int fragment_shader = load_shader(GLES32.GL_FRAGMENT_SHADER, fragment_shader_code);
+
+  // link program and shaders
+  cube_programs[index] = GLES32.glCreateProgram();
+  GLES32.glAttachShader(cube_programs[index], vertex_shader);
+  GLES32.glAttachShader(cube_programs[index], fragment_shader);
+  GLES32.glLinkProgram(cube_programs[index]);
+  Matrix.setIdentityM(cube_model_matrices[index], 0);
+  total_cubes_count++;
+}
+
+void cube_draw(int program, FloatBuffer vertex_buffer,
+  FloatBuffer color_buffer, ShortBuffer draw_list_buffer,
+  float[] mvp_matrix) {
+
+  GLES32.glUseProgram(program);
+
+  final int position_handle = GLES32.glGetAttribLocation(program, "vPosition");
+  GLES32.glEnableVertexAttribArray(position_handle);
+  GLES32.glVertexAttribPointer(
+      position_handle, COORDS_PER_VERTEX, GLES32.GL_FLOAT, false, 0, vertex_buffer);
+
+  final int color_handle = GLES32.glGetAttribLocation(program, "vColor");
+  GLES32.glEnableVertexAttribArray(color_handle);
+  GLES32.glVertexAttribPointer(color_handle, 4, GLES32.GL_FLOAT, false, 0, color_buffer);
+
+  final int matrix_handle = GLES32.glGetUniformLocation(program, "uMVPMatrix");
+  GLES32.glUniformMatrix4fv(matrix_handle, 1, false, mvp_matrix, 0);
+
+  GLES32.glDrawElements(
+      GLES32.GL_TRIANGLES, cube_draw_order.length, GLES32.GL_UNSIGNED_SHORT, draw_list_buffer);
+
+  // disable vertex attributes
+  GLES32.glDisableVertexAttribArray(position_handle);
+  GLES32.glDisableVertexAttribArray(color_handle);
+}
+
+void cube_set_color(int index, float[] color) {
+  final ByteBuffer b = ByteBuffer.allocateDirect(color.length * 4); // 4 byter per float
+  b.order(ByteOrder.nativeOrder());
+  cube_color_buffers[index] = b.asFloatBuffer();
+  cube_color_buffers[index].put(color);
+  cube_color_buffers[index].position(0);
+}
+
+// ------------ END CUBE --------
+
+// ------------ SPHERE --------
+
+final int SPHERE_MAX_OBJECTS = 24;
+
+int total_spheres_count = 0;
+
+int[] sphere_vertices = new int[SPHERE_MAX_OBJECTS];
+int[] sphere_programs = new int[SPHERE_MAX_OBJECTS];
+
+final float[][] sphere_colors = new float[SPHERE_MAX_OBJECTS][4];
+final float[][] sphere_model_matrices = new float[SPHERE_MAX_OBJECTS][16];
+
+final FloatBuffer[] sphere_vertex_buffers = new FloatBuffer[SPHERE_MAX_OBJECTS];
+final IntBuffer[] sphere_index_buffers = new IntBuffer[SPHERE_MAX_OBJECTS];
+
+void sphere_create(float radius, int stacks, int slices, float[] color) {
+  if (total_spheres_count >= SPHERE_MAX_OBJECTS) {
+    context.runOnUiThread(new Runnable() {
+      public void run() {
+        api.addErrorLog("Sphere limit reached. Increase it before adding a new sphere.");
+      }
+    });
+    return;
+  }
+
+  final int index = total_spheres_count;
+
+  sphere_colors[index] = color;
+
+  final int vertex_count = (stacks + 1) * (slices + 1);
+  final float[] sphere_coords = new float[vertex_count * COORDS_PER_VERTEX];
+
+  int count = 0;
+  for (int i = 0; i <= stacks; i++) {
+    float phi = (float) Math.PI * i / stacks;
+    for (int j = 0; j <= slices; j++) {
+      float theta = (float) (2.0f * Math.PI * j / slices);
+
+      float x = (float) (Math.sin(phi) * Math.cos(theta)) * radius;
+      float y = (float) (Math.sin(phi) * Math.sin(theta)) * radius;
+      float z = (float) Math.cos(phi) * radius;
+
+      sphere_coords[count++] = x;
+      sphere_coords[count++] = y;
+      sphere_coords[count++] = z;
+    }
+  }
+
+  // create index buffer for sphere triangles
+  final int[] indices = new int[stacks * slices * 6];
+  int index_count = 0;
+  for (int i = 0; i < stacks; i++) {
+    for (int j = 0; j < slices; j++) {
+      int first = (i * (slices + 1)) + j;
+      int second = first + slices + 1;
+
+      indices[index_count++] = first;
+      indices[index_count++] = second;
+      indices[index_count++] = first + 1;
+
+      indices[index_count++] = second;
+      indices[index_count++] = second + 1;
+      indices[index_count++] = first + 1;
+    }
+  }
+
+  // setup vertex buffer
+  final ByteBuffer bb = ByteBuffer.allocateDirect(sphere_coords.length * 4);
+  bb.order(ByteOrder.nativeOrder());
+  sphere_vertex_buffers[index] = bb.asFloatBuffer();
+  sphere_vertex_buffers[index].put(sphere_coords);
+  sphere_vertex_buffers[index].position(0);
+
+  // setup index buffer
+  final ByteBuffer ib = ByteBuffer.allocateDirect(indices.length * 4);
+  ib.order(ByteOrder.nativeOrder());
+  sphere_index_buffers[index] = ib.asIntBuffer();
+  sphere_index_buffers[index].put(indices);
+  sphere_index_buffers[index].position(0);
+
+  // load shaders
+  final String vertex_shader_code = FileUtil.readFile(new File(projectFile, "shaders/sphere/vertex_shader.vert"));
+  final String fragment_shader_code = FileUtil.readFile(new File(projectFile, "shaders/sphere/fragment_shader.frag"));
+  final int vertex_shader = load_shader(GLES32.GL_VERTEX_SHADER, vertex_shader_code);
+  final int fragment_shader = load_shader(GLES32.GL_FRAGMENT_SHADER, fragment_shader_code);
+
+  sphere_programs[index] = GLES32.glCreateProgram();
+  GLES32.glAttachShader(sphere_programs[index], vertex_shader);
+  GLES32.glAttachShader(sphere_programs[index], fragment_shader);
+  GLES32.glLinkProgram(sphere_programs[index]);
+
+  Matrix.setIdentityM(sphere_model_matrices[index], 0);
+  total_spheres_count++;
+}
+
+void sphere_draw(int program, FloatBuffer vertex_buffer, IntBuffer index_buffer, float[] color, float[] mvp_matrix) {
+  GLES32.glUseProgram(program);
+
+  final int position_handle = GLES32.glGetAttribLocation(program, "vPosition");
+  GLES32.glEnableVertexAttribArray(position_handle);
+  GLES32.glVertexAttribPointer(
+      position_handle, COORDS_PER_VERTEX, GLES32.GL_FLOAT, false, 0, vertex_buffer);
+
+  final int color_handle = GLES32.glGetUniformLocation(program, "vColor");
+  GLES32.glUniform4fv(color_handle, 1, color, 0);
+
+  final int matrix_handle = GLES32.glGetUniformLocation(program, "uMVPMatrix");
+  GLES32.glUniformMatrix4fv(matrix_handle, 1, false, mvp_matrix, 0);
+
+  GLES32.glDrawElements(GLES32.GL_TRIANGLES, index_buffer.limit(), GLES32.GL_UNSIGNED_INT, index_buffer);
+  GLES32.glDisableVertexAttribArray(position_handle);
+}
+
+void sphere_set_color(int index, float[] color) {
+  sphere_colors[index] = color;
+}
+
+// ------------ END SPHERE --------
+
+// ------------ MAIN --------
+
+float[] view_matrix = new float[16];
+float[] mvp_matrix = new float[16];
+float[] model_matrix = new float[16];
+float[] projection_matrix = new float[16];
+
+int main() {
+  float cube_angle = 1f;
+  float cube_y = 0f;
+
+  boolean movingUp = true;
+
+  BSHGLSurfaceView surface_view = new BSHGLSurfaceView(context);
+  BSHGLRenderer renderer = surface_view.getRenderer();
 
   renderer.events.setOnSurfaceCreated(new RendererEvents.OnSurfaceCreated() {
     public void onCallEvent(GL10 gl, EGLConfig config) {
-      GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-      GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-      blueCube = new Cube();
-      yellowCube = new Cube();
-      pinkCube = new Cube();
-      blueCircle = new Circle(0.5f, 40);
-      blueTriangle = new Triangle();
-      blueCube.setColors(blueCubeColors);
-      yellowCube.setColors(yellowCubeColors);
-      pinkCube.setColors(pinkCubeColors);
-      blueCircle.setColor(new float[] {
-        0.0f, 1.0f, 0.0f, 1.0f
-      });
-      blueTriangle.setColor(new float[] {
-        1.0f, 0.0f, 1.0f, 1.0f
-      });
+      GLES32.glEnable(GLES32.GL_DEPTH_TEST);
+      GLES32.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+      for (int ignored = 0; ignored < 5; ignored++) {
+
+        float[] random_vertex_color = new float[] {
+          (float) Math.random(), (float) Math.random(), (float) Math.random(), 1.0f
+        };
+
+        float[] random_colors = new float[32];
+        for (int i = 0; i < 8; i++) {
+          System.arraycopy(random_vertex_color, 0, random_colors, i * 4, 4);
+        }
+
+        cube_create(random_colors);
+        sphere_create(1.0f, 25, 25, random_vertex_color);
+      }
     }
   });
 
   renderer.events.setOnSurfaceChanged(new RendererEvents.OnSurfaceChanged() {
     public void onCallEvent(GL10 gl, int width, int height) {
-      GLES20.glViewport(0, 0, width, height);
-      float ratio = (float) width / height;
-      Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 10);
+      GLES32.glViewport(0, 0, width, height);
+      final float ratio = (float) width / height;
+      Matrix.frustumM(
+        projection_matrix,
+        0,
+        -ratio,
+        ratio,
+        -1,
+        1,
+        1f,  // near
+        10f); // far
     }
   });
 
   renderer.events.setOnDrawFrame(new RendererEvents.OnDrawFrame() {
     public void onCallEvent(GL10 gl) {
-      GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+      GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT);
 
-      Matrix.setLookAtM(mViewMatrix, 0,
-          0f, 0f, -5f, // Camera position
+      Matrix.setLookAtM(view_matrix, 0,
+          0f, 0f, -7f, // Camera position
           0f, 0f, 0f,  // Look at origin
-          0f, 1f, 0f); // Up vector
+          0f, .5f, 0f); // Up vector
 
-      // cubes
-      {
-        // blue cube
-        {
-          Matrix.setIdentityM(mModelMatrix, 0);
-          Matrix.translateM(
-              mModelMatrix, // matrix
-              0,  // index into m where the matrix starts
-              1.5f,  // x
-              1.5f,  // y
-              0f  // z
-              ); // Move right
-          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
+      for (int i = 0; i < total_cubes_count; i++) {
+        Matrix.setIdentityM(cube_model_matrices[i], 0);
 
-          float[] tempMatrix = new float[16];
-          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
+        Matrix.translateM(
+          cube_model_matrices[i], // matrix
+          0,  // index into m where the matrix starts
+          ((i - total_cubes_count / 2) * 2f),  // x
+          cube_y,  // y
+          0f);  // z
+        Matrix.rotateM(cube_model_matrices[i], 0, cube_angle, 0f, 1.0f, 0f);
 
-          blueCube.draw(mMVPMatrix);
+        float[] temp_matrix = new float[16];
+        Matrix.multiplyMM(temp_matrix, 0, view_matrix, 0, cube_model_matrices[i], 0);
+        Matrix.multiplyMM(mvp_matrix, 0, projection_matrix, 0, temp_matrix, 0);
+
+        cube_draw(
+          cube_programs[i],
+          cube_vertex_buffers[i],
+          cube_color_buffers[i],
+          cube_draw_list_buffers[i],
+          mvp_matrix);
+      }
+
+      // draw spheres
+      for (int i = 0; i < total_spheres_count; i++) {
+        Matrix.setIdentityM(sphere_model_matrices[i], 0);
+
+        Matrix.translateM(
+          sphere_model_matrices[i], // matrix
+          0,  // index into m where the matrix starts
+          ((i - total_spheres_count / 2) * 2f),  // x
+          cube_y + 2f,  // y
+          0f);  // z
+        Matrix.rotateM(sphere_model_matrices[i], 0, cube_angle, 0f, 1.0f, 0f);
+
+        float[] temp_matrix = new float[16];
+        Matrix.multiplyMM(temp_matrix, 0, view_matrix, 0, sphere_model_matrices[i], 0);
+        Matrix.multiplyMM(mvp_matrix, 0, projection_matrix, 0, temp_matrix, 0);
+
+        sphere_draw(
+          sphere_programs[i],
+          sphere_vertex_buffers[i],
+          sphere_index_buffers[i],
+          sphere_colors[i],
+          mvp_matrix);
+      }
+
+      cube_set_color(0, new float[] {
+          1.0f, 1.0f, 1.0f, 1.0f,
+          1.0f, 1.0f, 1.0f, 1.0f,
+          1.0f, 1.0f, 1.0f, 1.0f,
+          1.0f, 1.0f, 1.0f, 1.0f,
+          1.0f, 1.0f, 1.0f, 1.0f,
+          1.0f, 1.0f, 1.0f, 1.0f,
+          1.0f, 1.0f, 1.0f, 1.0f,
+          1.0f, 1.0f, 1.0f, 1.0f
+      });
+
+      sphere_set_color(0, new float[] {
+          1.0f, 1.0f, 1.0f, 1.0f
+      });
+
+      cube_angle += 25f;
+      if (movingUp) {
+        cube_y += .1f;
+        if (cube_y >= 5) {
+           movingUp = false;
         }
-
-        // yellow cube
-        {
-          Matrix.setIdentityM(mModelMatrix, 0);
-          Matrix.translateM(
-              mModelMatrix, // matrix
-              0,  // index into m where the matrix starts
-              1.5f,  // x
-              0f,  // y
-              0f  // z
-              ); // Move right
-          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
-
-          float[] tempMatrix = new float[16];
-          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
-
-          yellowCube.draw(mMVPMatrix);
-        }
-
-        // pink cube
-        {
-          Matrix.setIdentityM(mModelMatrix, 0);
-          Matrix.translateM(
-              mModelMatrix, // matrix
-              0,  // index into m where the matrix starts
-              1.5f,  // x
-              -1.5f,  // y
-              0f  // z
-              ); // Move right
-          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
-
-          float[] tempMatrix = new float[16];
-          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
-
-          pinkCube.draw(mMVPMatrix);
+      } else {
+        cube_y -= .1f;
+        if (cube_y <= -5) {
+          movingUp = true;
         }
       }
-      // circles
-      {
-        // blue circle
-        {
-          Matrix.setIdentityM(mModelMatrix, 0);
-          Matrix.translateM(
-              mModelMatrix, // matrix
-              0,  // index into m where the matrix starts
-              -1.5f,  // x
-              0,  // y
-              0f  // z
-              ); // Move right
-          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
-
-          float[] tempMatrix = new float[16];
-          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
-          blueCircle.draw(mMVPMatrix);
-        }
-      }
-      // triangles
-      {
-        // blue triangle
-        {
-          Matrix.setIdentityM(mModelMatrix, 0);
-          Matrix.translateM(
-              mModelMatrix, // matrix
-              0,  // index into m where the matrix starts
-              0,  // x
-              0,  // y
-              0f  // z
-              ); // Move right
-          Matrix.rotateM(mModelMatrix, 0, angle, 0.0f, 1.0f, 0.0f);
-
-          float[] tempMatrix = new float[16];
-          Matrix.multiplyMM(tempMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-          Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, tempMatrix, 0);
-          blueTriangle.draw(mMVPMatrix);
-        }
-      }
-      angle += 1.0f;
     }
   });
 
-  api.addViewAtRoot(surfaceView);
+  api.addViewAtRoot(surface_view);
+
+  return 0;
+}
+
+void printInfo() {
+  api.addInfoLog("OpenGL ES Version: 3.2");
+  api.addInfoLog("Max cubes supported: " + CUBE_MAX_OBJECTS.toString());
+  api.addInfoLog("Max spheres supported: " + SPHERE_MAX_OBJECTS.toString());
 }
 
 api.lifecycleEvents.setOnCreate(new Event() {
   public void onCallEvent() {
-    openGles();
+    printInfo();
+    main();
   }
 });
