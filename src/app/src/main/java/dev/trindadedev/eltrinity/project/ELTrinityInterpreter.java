@@ -49,7 +49,7 @@ public class ELTrinityInterpreter extends Interpreter {
   }
 
   public ELTrinityInterpreter(final Context context,
-    final ProjectBean project, final InterpreterEvents events,
+    final ProjectBean project, final InterpreterEvents events
   ) throws EvalError {
     super();
     this.logs = new ArrayList<>();
