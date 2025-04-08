@@ -71,7 +71,7 @@ public class ELTrinityInterpreter extends Interpreter {
 
     if (project == null || project.basicInfo == null || project.basicInfo.name == null) {
       addErrorLog("Invalid project data: basicInfo or name is null");
-      throw new EvalError("Invalid project: project name is null");
+      throw new IllegalStateException("Invalid project: project name is null");
     }
 
     projectPath = new File(ProjectManager.getProjectsFile(), project.basicInfo.name);
