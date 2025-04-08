@@ -15,20 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectManager extends Contextualizable {
-  private String path;
+  private File projectFolder;
 
   public ProjectManager(@NonNull final Context context) {
     this(context, null);
   }
 
-  public ProjectManager(@NonNull final Context context, final String scId) {
+  public ProjectManager(@NonNull final Context context, final File projectFolder) {
     super(context);
-    this.path = path;
+    this.projectFolder = projectFolder;
   }
 
   @Nullable
   public final ProjectBean getCurrentProject() {
-    return getProjectByPath(path);
+    return getProjectByPath(projectFoldrt);
   }
 
   /**
@@ -48,7 +48,7 @@ public class ProjectManager extends Contextualizable {
     var projectBasicInfo =
       GsonUtil.getGson().fromJson(projectBasicInfoJsonContent, projectBasicInfoFileJsonType);
 
-    project.basicInfo = (ProjectBasicInfo) projectBasicInfo;
+    project.basicInfo = (ProjectBasicInfoBean) projectBasicInfo;
     return project;
   }
 

@@ -74,7 +74,7 @@ public class FileUtil {
   }
 
   public static void createNewFileIfNotPresent(final File file) {
-    int lastSep = file.getAbsoultePath().lastIndexOf(File.separator);
+    int lastSep = file.getAbsolutePath().lastIndexOf(File.separator);
     if (lastSep > 0) {
       String dirPath = file.getAbsolutePath().substring(0, lastSep);
       makeDir(new File(dirPath));
