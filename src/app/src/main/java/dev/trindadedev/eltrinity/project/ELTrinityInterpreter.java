@@ -36,13 +36,14 @@ public class ELTrinityInterpreter extends Interpreter {
   private static final String LOG_ERROR = "[ERROR]";
   private static final String LOG_INFO = "[INFO]";
 
-  public InterpreterEvents events;
-
   protected Context context;
+  
+  protected ProjectBean project;
   protected File projectPath;
+
   protected List<String> logs;
   protected API api;
-  protected ProjectBean project;
+  protected InterpreterEvents events;
 
   public ELTrinityInterpreter(final Context context) throws EvalError {
     this(context, new ProjectBean(), new InterpreterEvents());
@@ -129,20 +130,20 @@ public class ELTrinityInterpreter extends Interpreter {
 
     addSuccessLog("Compiled successfully!");
 
-    if (api.project.basicInfo.name == null || api.project.basicInfo.name.isEmpty()) {
+    if (project.basicInfo.name == null || project.basicInfo.name.isEmpty()) {
       addWarningLog("Please provide Project Name");
     } else {
-      addInfoLog("Running " + api.project.basicInfo.name + "...");
+      addInfoLog("Running " + project.basicInfo.name + "...");
     }
 
-    if (api.project.basicInfo.description == null || api.project.basicInfo.description.isEmpty()) {
+    if (project.basicInfo.description == null || project.basicInfo.description.isEmpty()) {
       addWarningLog("Please provide Project Description");
     } else {
-      addInfoLog("Project Description: " + api.project.basicInfo.description);
+      addInfoLog("Project Description: " + project.basicInfo.description);
     }
 
-    final String authorName = api.project.basicInfo.authorName;
-    final String authorUserName = api.project.basicInfo.authorUserName;
+    final String authorName = project.basicInfo.authorName;
+    final String authorUserName = project.basicInfo.authorUserName;
 
     if ((authorName == null || authorName.isEmpty())
         && (authorUserName == null || authorUserName.isEmpty())) {

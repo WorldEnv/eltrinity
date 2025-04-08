@@ -21,5 +21,5 @@ public class C2BSH {
     System.loadLibrary("c2bsh");
   }
 
-  public native String convert(final String c_code);
+  public static native String convert(final String c_code);
 }
