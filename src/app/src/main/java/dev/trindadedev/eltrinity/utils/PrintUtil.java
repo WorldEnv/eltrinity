@@ -27,7 +27,7 @@ public class PrintUtil {
   private static final List<String> allLogs = new ArrayList<>();
 
   public static void print(final Object toPrint) {
-    print(tag, toPrint);
+    print(TAG, toPrint);
   }
 
   public static void print(final String tag, final Object toPrint) {
