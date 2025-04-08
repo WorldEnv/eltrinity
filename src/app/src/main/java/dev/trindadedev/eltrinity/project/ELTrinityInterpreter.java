@@ -74,7 +74,7 @@ public class ELTrinityInterpreter extends Interpreter {
       throw new IllegalStateException("Invalid project: project name is null");
     }
 
-    projectPath = new File(ProjectManager.getProjectsFile(), project.basicInfo.name);
+    projectPath = new File(ProjectManager.getProjectsFile(), project.projectFolderPath);
     configureVariables();
   }
 
