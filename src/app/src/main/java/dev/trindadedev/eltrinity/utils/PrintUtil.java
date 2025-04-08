@@ -22,10 +22,16 @@ import java.util.List;
 
 public class PrintUtil {
 
+  private static final String TAG = "ELTrinity";
+
   private static final List<String> allLogs = new ArrayList<>();
 
   public static void print(final Object toPrint) {
+    print(tag, toPrint);
+  }
+
+  public static void print(final String tag, final Object toPrint) {
     allLogs.add(toPrint.toString());
-    Log.d(toPrint.toString());
+    Log.d(tag, toPrint.toString());
   }
 }
