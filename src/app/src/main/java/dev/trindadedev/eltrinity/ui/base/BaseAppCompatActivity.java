@@ -44,6 +44,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
   @NonNull private View rootView;
   @NonNull private ProgressDialog progressDialog;
   @NonNull protected PermissionManager.Storage storagePermissionManager;
+  @NonNull protected PermissionManager.Overlay overlayPermissionManager;
 
   private final ActivityResultLauncher<Intent> allFilesPermissionLauncher =
       registerForActivityResult(
@@ -59,6 +60,13 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
             onReceive(PermissionType.STORAGE, storagePermissionManager.check());
           });
 
+  private final ActivityResultLauncher<Intent> overlayPermissionLauncher =
+      registerForActivityResult(
+          new ActivityResultContracts.StartActivityForResult(),
+          result -> {
+            onReceive(PermissionType.OVERLAY, overlayPermissionManager.check());
+          });
+
   @Override
   protected void onCreate(@Nullable final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -68,6 +76,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     storagePermissionManager =
         new PermissionManager.Storage(
             this, allFilesPermissionLauncher, readWritePermissionLauncher);
+    overlayPermissionManager =
+        new PermissionManager.Overlay(this, overlayPermissionLauncher);
     progressDialog = new ProgressDialog(this);
     onPostBind(savedInstanceState);
   }
@@ -80,6 +90,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
     if (storagePermissionManager.check() == PermissionStatus.DENIED)
       storagePermissionManager.request();
+    if (overlayPermissionManager.check() == PermissionStatus.DENIED)
+      overlayPermissionManager.request();
     EdgeToEdge.enable(this);
   }
 

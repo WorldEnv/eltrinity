@@ -84,4 +84,35 @@ public class PermissionManager {
       storageReadWriteLauncher.launch(perms);
     }
   }
+
+  public static final class Overlay implements Permission {
+    private final Activity activity;
+    private final ActivityResultLauncher<Intent> overlayPermissionLauncher;
+
+    public Overlay(
+        final Activity activity,
+        final ActivityResultLauncher<Intent> overlayPermissionLauncher) {
+      this.activity = activity;
+      this.overlayPermissionLauncher = overlayPermissionLauncher;
+    }
+
+    @Override
+    public PermissionStatus check() {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        return Settings.canDrawOverlays(activity)
+            ? PermissionStatus.GRANTED
+            : PermissionStatus.DENIED;
+      }
+      return PermissionStatus.GRANTED;
+    }
+
+    @Override
+    public final void request() {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(activity)) {
+        var intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+        intent.setData(Uri.parse("package:" + activity.getPackageName()));
+        overlayPermissionLauncher.launch(intent);
+      }
+    }
+  }
 }
