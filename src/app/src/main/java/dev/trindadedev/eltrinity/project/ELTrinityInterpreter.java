@@ -27,8 +27,6 @@ import java.util.List;
 
 public class ELTrinityInterpreter extends Interpreter {
 
-  public static final String PROJECTS_PATH = "/sdcard/bsh";
-
   private static final String LOG_TASK = "[TASK]";
   private static final String LOG_SUCCESS = "[SUCCESS]";
   private static final String LOG_WARNING = "[WARNING]";

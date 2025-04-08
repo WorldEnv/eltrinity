@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.ui.activities;
+package dev.trindadedev.eltrinity.ui.activities.runner;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -33,6 +33,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dev.trindadedev.eltrinity.databinding.ActivityRunnerBinding;
 import dev.trindadedev.eltrinity.project.api.BaseAPIActivity;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
+import dev.trindadedev.eltrinity.project.manage.ProjectManager;
 import java.io.File;
 
 public class RunnerActivity extends BaseAPIActivity {
@@ -42,6 +43,9 @@ public class RunnerActivity extends BaseAPIActivity {
 
   @NonNull
   private ELTrinityInterpreter interpreter;
+
+  @Nullable
+  private RunnerState runnerState;
 
   @Override
   @NonNull
@@ -73,9 +77,15 @@ public class RunnerActivity extends BaseAPIActivity {
   @Override
   protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
     super.onBindLayout(savedInstanceState);
+    configureData();
+  }
+
+  @Override
+  protected void onPostBind(@Nullable final Bundle savedInstanceState) {
+    super.onPostBind(savedInstanceState);
     try {
-      final String projectName = getIntent().getStringExtra("project_name");
-      final File projectPath = new File(ELTrinityInterpreter.PROJECTS_PATH, projectName);
+      final String projectName = editorState.project.basicInfo.name;
+      final File projectPath = new File(ProjectManager.getProjectsFile(), projectName);
 
       final ELTrinityInterpreter.InterpreterEvents interpreterEvents =
           new ELTrinityInterpreter.InterpreterEvents();
@@ -89,6 +99,19 @@ public class RunnerActivity extends BaseAPIActivity {
 
     } catch (final EvalError e) {
       showErrorDialog("Error: " + e.getMessage());
+    }
+  }
+  @Override
+  public void onSaveInstanceState(final Bundle bundle) {
+    bundle.putParcelable("runner_state", runnerState);
+  }
+
+  /** Get and define all needed variables */
+  private final void configureData(@Nullable final Bundle savedInstanceState) {
+    if (savedInstanceState == null) {
+      runnerState = getParcelable("runner_state", RunnerState.class);
+    } else {
+      runnerState = getParcelable(savedInstanceState, "runner_state", RunnerState.class);
     }
   }
 
