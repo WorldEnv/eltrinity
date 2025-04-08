@@ -84,8 +84,7 @@ public class RunnerActivity extends BaseAPIActivity {
 
       interpreterEvents.setOnLogAdded(this::updateLogsUI);
 
-      interpreter.setProject(runnerState.project);
-      interpreter.setEvents(interpreterEvents);
+      interpreter = new ELTrinityInterpreter(this, runnerState.project, interpreterEvents);
 
       interpreter.runProjectMain();
       interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
