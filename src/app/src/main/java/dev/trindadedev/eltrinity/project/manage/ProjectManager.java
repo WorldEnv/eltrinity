@@ -28,7 +28,7 @@ public class ProjectManager extends Contextualizable {
 
   @Nullable
   public final ProjectBean getCurrentProject() {
-    return getProjectByPath(projectFoldrt);
+    return getProjectByPath(projectFolder);
   }
 
   /**
