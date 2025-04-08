@@ -3,7 +3,10 @@ package dev.trindadedev.eltrinity.beans;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+import com.google.gson.annotations.Expose;
+import dev.trindadedev.eltrinity.utils.ParcelUtil;
 import dev.trindadedev.eltrinity.utils.PrintUtil;
+import java.util.ArrayList;
 
 public class ProjectBean extends BaseBean implements Parcelable {
   public static final Creator<ProjectBean> CREATOR =
@@ -17,18 +20,18 @@ public class ProjectBean extends BaseBean implements Parcelable {
         }
       };
 
-  public String name;
+  public ProjectBasicInfoBean basicInfo;
 
   public ProjectBean() {
-    name = "Project";
+    basicInfo = new ProjectBasicInfoBean();
   }
 
   public ProjectBean(final Parcel parcel) {
-    name = parcel.readString();
+    basicInfo = ParcelUtil.readParcelable(parcel, ProjectBasicInfoBean.class);
   }
 
   public void copy(final ProjectBean other) {
-    name = other.name;
+    basicInfo = other.basicInfo;
   }
 
   @Override
@@ -43,11 +46,11 @@ public class ProjectBean extends BaseBean implements Parcelable {
 
   @Override
   public void print() {
-    PrintUtil.print(name);
+    basicInfo.print();
   }
 
   @Override
   public void writeToParcel(final Parcel parcel, final int flags) {
-    parcel.writeString(name);
+    parcel.writeParcelable(basicInfo, flags);
   }
 }

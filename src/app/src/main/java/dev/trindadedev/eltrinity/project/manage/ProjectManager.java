@@ -4,20 +4,18 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.gson.reflect.TypeToken;
-import dev.trindadedev.eltrinity.Blockode;
+import dev.trindadedev.eltrinity.ELTrinity;
 import dev.trindadedev.eltrinity.base.Contextualizable;
-import dev.trindadedev.blockode.beans.BlockBean;
-import dev.trindadedev.blockode.beans.ProjectBasicInfoBean;
-import dev.trindadedev.blockode.beans.ProjectBean;
-import dev.trindadedev.blockode.beans.VariableBean;
-import dev.trindadedev.blockode.io.File;
-import dev.trindadedev.blockode.utils.FileUtil;
-import dev.trindadedev.blockode.utils.GsonUtil;
+import dev.trindadedev.eltrinity.beans.ProjectBean;
+import dev.trindadedev.eltrinity.beans.ProjectBasicInfoBean;
+import dev.trindadedev.eltrinity.utils.FileUtil;
+import dev.trindadedev.eltrinity.utils.GsonUtil;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectManager extends Contextualizable {
-  private String scId;
+  private String path;
 
   public ProjectManager(@NonNull final Context context) {
     this(context, null);
@@ -25,37 +23,33 @@ public class ProjectManager extends Contextualizable {
 
   public ProjectManager(@NonNull final Context context, final String scId) {
     super(context);
-    this.scId = scId;
+    this.path = path;
   }
 
   @Nullable
   public final ProjectBean getCurrentProject() {
-    return getProjectByScId(scId);
+    return getProjectByPath(path);
   }
 
   /**
    * Creates and returns a ProjectBean based in files by scId
    *
-   * @param scId The id of project to be searched
+   * @param path the source path.
    */
   @Nullable
-  public static final ProjectBean getProjectByScId(final String scId) {
-    var basicInfoFileJsonType = new TypeToken<ProjectBasicInfoBean>() {}.getType();
-    var basicInfoJsonContent = FileUtil.readFile(getBasicInfoFile(scId).getAbsolutePath(), false);
-    var basicInfo = GsonUtil.getGson().fromJson(basicInfoJsonContent, basicInfoFileJsonType);
-    var variablesFileJsonType = new TypeToken<List<VariableBean>>() {}.getType();
-    var variablesFileJsonContent =
-        FileUtil.readFile(getVariablesFile(scId).getAbsolutePath(), false);
-    var blocksFileJsonType = new TypeToken<List<BlockBean>>() {}.getType();
-    var blocksFileJsonContent = FileUtil.readFile(getBlocksFile(scId).getAbsolutePath(), false);
-    var variables = GsonUtil.getGson().fromJson(variablesFileJsonContent, variablesFileJsonType);
-    var blocks = GsonUtil.getGson().fromJson(blocksFileJsonContent, blocksFileJsonType);
-    var toReturnProject = new ProjectBean();
-    toReturnProject.scId = scId;
-    toReturnProject.basicInfo = (ProjectBasicInfoBean) basicInfo;
-    toReturnProject.variables = (ArrayList<VariableBean>) variables;
-    toReturnProject.blocks = (ArrayList<BlockBean>) blocks;
-    return toReturnProject;
+  public static final ProjectBean getProjectByPath(final String path) {
+    var name = path.substring(path.lastIndexOf("."));
+    var project = new ProjectBean();
+
+    var projectBasicInfoFileJsonType =
+      new TypeToken<ProjectBasicInfoBean>() {}.getType();
+    var projectBasicInfoJsonContent =
+      FileUtil.readFile(getBasicInfoFile(name));
+    var projectBasicInfo =
+      GsonUtil.getGson().fromJson(projectBasicInfoJsonContent, projectBasicInfoFileJsonType);
+
+    project.basicInfo = projectBasicInfo;
+    return project;
   }
 
   /**
@@ -64,32 +58,20 @@ public class ProjectManager extends Contextualizable {
    * @param project The instance of ProjectBean with data to be created.
    */
   public static final void createProjectByBean(@NonNull final ProjectBean project) {
-    var projectRootDir = new File(getProjectsFile(), project.scId).getAbsolutePath();
-    var basicInfoFileJson = GsonUtil.getGson().toJson(project.basicInfo);
-    var variablesFileJson = GsonUtil.getGson().toJson(project.variables);
-    var blocksFileJson = GsonUtil.getGson().toJson(project.blocks);
-    FileUtil.makeDir(projectRootDir);
-    FileUtil.writeText(getBasicInfoFile(project.scId).getAbsolutePath(), basicInfoFileJson);
-    FileUtil.writeText(getVariablesFile(project.scId).getAbsolutePath(), variablesFileJson);
-    FileUtil.writeText(getBlocksFile(project.scId).getAbsolutePath(), blocksFileJson);
+    final var projectPath = new File(getProjectsFile(), projectName);
+    final var projectBasicInfo = project.basicInfo;
+    final var projectBasicInfoJson = GsonUtil.getGson().toJson(projectBasicInfo);
+    FileUtil.makeDir(projectPath);
+    FileUtil.writeFile(getBasicInfoFile(projectBasicInfo.name), projectBasicInfoJson);
   }
 
   /** Folder where all projects are stored */
   public static final File getProjectsFile() {
-    return new File(Blockode.getPublicFolderFile(), "projects/");
+    return new File(ELTrinity.getPublicFolderFile(), "projects/");
   }
 
   /** The file where basic info of project are stored, like name, packageName */
-  public static final File getBasicInfoFile(final String scId) {
-    return new File(getProjectsFile(), scId + "/data/basic_info.json");
-  }
-
-  @Nullable
-  public String getScId() {
-    return this.scId;
-  }
-
-  public void setScId(final String scId) {
-    this.scId = scId;
+  public static final File getBasicInfoFile(final String name) {
+    return new File(getProjectsFile(), name + "/basic_info.json");
   }
 }

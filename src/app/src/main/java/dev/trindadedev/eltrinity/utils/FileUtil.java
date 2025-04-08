@@ -72,4 +72,30 @@ public class FileUtil {
       }
     }
   }
+
+  public static void createNewFileIfNotPresent(final File path) {
+    int lastSep = file.getAbsoultePath().lastIndexOf(File.separator);
+    if (lastSep > 0) {
+      String dirPath = file.getAbsolutePath().substring(0, lastSep);
+      makeDir(dirPath);
+    }
+
+    try {
+      if (!file.exists()) file.createNewFile();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void writeText(final File file, final String text) {
+    createNewFileIfNotPresent(file);
+
+    try (FileWriter fileWriter = new FileWriter(file.getAbsolutePath(), false)) {
+      fileWriter.write(text);
+      fileWriter.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
 }
