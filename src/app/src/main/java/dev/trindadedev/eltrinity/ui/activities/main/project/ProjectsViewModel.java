@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import dev.trindadedev.eltrinity.project.manage.ProjectManager;
 import dev.trindadedev.eltrinity.utils.PrintUtil;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.io.File;
 import java.util.List;
 
 public class ProjectsViewModel extends ViewModel {

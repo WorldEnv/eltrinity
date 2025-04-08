@@ -23,12 +23,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import dev.trindadedev.eltrinity.beans.ProjectBean;
+import dev.trindadedev.eltrinity.databinding.ActivityMainBinding;
 import dev.trindadedev.eltrinity.ui.activities.main.project.ProjectsAdapter;
 import dev.trindadedev.eltrinity.ui.activities.main.project.ProjectsViewModel;
 import dev.trindadedev.eltrinity.ui.activities.runner.RunnerActivity;
 import dev.trindadedev.eltrinity.ui.activities.runner.RunnerState;
 import dev.trindadedev.eltrinity.ui.base.BaseAppCompatActivity;
-import dev.trindadedev.eltrinity.databinding.ActivityMainBinding;
 
 public class MainActivity extends BaseAppCompatActivity {
 

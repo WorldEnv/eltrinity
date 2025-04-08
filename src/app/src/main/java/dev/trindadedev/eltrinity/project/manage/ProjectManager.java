@@ -6,13 +6,11 @@ import androidx.annotation.Nullable;
 import com.google.gson.reflect.TypeToken;
 import dev.trindadedev.eltrinity.ELTrinity;
 import dev.trindadedev.eltrinity.base.Contextualizable;
-import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.beans.ProjectBasicInfoBean;
+import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.utils.FileUtil;
 import dev.trindadedev.eltrinity.utils.GsonUtil;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProjectManager extends Contextualizable {
   private File projectFolder;
@@ -41,12 +39,10 @@ public class ProjectManager extends Contextualizable {
     var name = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf("/") + 1);
     var project = new ProjectBean();
 
-    var projectBasicInfoFileJsonType =
-      new TypeToken<ProjectBasicInfoBean>() {}.getType();
-    var projectBasicInfoJsonContent =
-      FileUtil.readFile(getBasicInfoFile(name));
+    var projectBasicInfoFileJsonType = new TypeToken<ProjectBasicInfoBean>() {}.getType();
+    var projectBasicInfoJsonContent = FileUtil.readFile(getBasicInfoFile(name));
     var projectBasicInfo =
-      GsonUtil.getGson().fromJson(projectBasicInfoJsonContent, projectBasicInfoFileJsonType);
+        GsonUtil.getGson().fromJson(projectBasicInfoJsonContent, projectBasicInfoFileJsonType);
 
     project.basicInfo = (ProjectBasicInfoBean) projectBasicInfo;
     return project;

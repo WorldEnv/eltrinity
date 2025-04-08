@@ -3,10 +3,7 @@ package dev.trindadedev.eltrinity.beans;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
-import com.google.gson.annotations.Expose;
 import dev.trindadedev.eltrinity.utils.ParcelUtil;
-import dev.trindadedev.eltrinity.utils.PrintUtil;
-import java.util.ArrayList;
 
 public class ProjectBean extends BaseBean implements Parcelable {
   public static final Creator<ProjectBean> CREATOR =

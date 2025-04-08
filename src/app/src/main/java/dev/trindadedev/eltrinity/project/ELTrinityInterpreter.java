@@ -20,10 +20,10 @@ import android.content.Context;
 import bsh.EvalError;
 import bsh.Interpreter;
 import dev.trindadedev.eltrinity.beans.ProjectBean;
-import dev.trindadedev.eltrinity.utils.FileUtil;
 import dev.trindadedev.eltrinity.c2bsh.C2BSH;
 import dev.trindadedev.eltrinity.project.api.API;
 import dev.trindadedev.eltrinity.project.manage.ProjectManager;
+import dev.trindadedev.eltrinity.utils.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class ELTrinityInterpreter extends Interpreter {
   private static final String LOG_INFO = "[INFO]";
 
   protected Context context;
-  
+
   protected ProjectBean project;
   protected File projectPath;
 
@@ -53,9 +53,9 @@ public class ELTrinityInterpreter extends Interpreter {
     this(context, project, new InterpreterEvents());
   }
 
-  public ELTrinityInterpreter(final Context context,
-    final ProjectBean project, final InterpreterEvents events
-  ) throws EvalError {
+  public ELTrinityInterpreter(
+      final Context context, final ProjectBean project, final InterpreterEvents events)
+      throws EvalError {
     super();
     this.logs = new ArrayList<>();
     this.context = context;

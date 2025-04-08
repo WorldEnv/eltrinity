@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
-import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
 import dev.trindadedev.eltrinity.project.Event;
 import dev.trindadedev.eltrinity.project.Events;
@@ -42,9 +41,10 @@ public class API {
     this(context, interpreter, new LifecycleEvents());
   }
 
-  public API(final Context context,
-    final ELTrinityInterpreter interpreter,
-    final LifecycleEvents lifecycleEvents) {
+  public API(
+      final Context context,
+      final ELTrinityInterpreter interpreter,
+      final LifecycleEvents lifecycleEvents) {
 
     this.context = context;
     this.interpreter = interpreter;

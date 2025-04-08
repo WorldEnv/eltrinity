@@ -22,30 +22,25 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.ViewGroup;
-import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import bsh.EvalError;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dev.trindadedev.eltrinity.databinding.ActivityRunnerBinding;
-import dev.trindadedev.eltrinity.project.api.BaseAPIActivity;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
-import dev.trindadedev.eltrinity.project.manage.ProjectManager;
-import java.io.File;
+import dev.trindadedev.eltrinity.project.api.BaseAPIActivity;
 
 public class RunnerActivity extends BaseAPIActivity {
 
-  @NonNull
-  private ActivityRunnerBinding binding;
+  @NonNull private ActivityRunnerBinding binding;
 
-  @NonNull
-  private ELTrinityInterpreter interpreter;
+  @NonNull private ELTrinityInterpreter interpreter;
 
-  @Nullable
-  private RunnerState runnerState;
+  @Nullable private RunnerState runnerState;
 
   @Override
   @NonNull
@@ -99,6 +94,7 @@ public class RunnerActivity extends BaseAPIActivity {
       showErrorDialog("Error: " + e.getMessage());
     }
   }
+
   @Override
   public void onSaveInstanceState(final Bundle bundle) {
     bundle.putParcelable("runner_state", runnerState);

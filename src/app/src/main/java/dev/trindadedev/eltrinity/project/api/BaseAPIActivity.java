@@ -19,11 +19,9 @@ package dev.trindadedev.eltrinity.project.api;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import dev.trindadedev.eltrinity.ui.base.BaseAppCompatActivity;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
+import dev.trindadedev.eltrinity.ui.base.BaseAppCompatActivity;
 
 public abstract class BaseAPIActivity extends BaseAppCompatActivity {
 
@@ -79,7 +77,7 @@ public abstract class BaseAPIActivity extends BaseAppCompatActivity {
   }
 
   /**
-   * Returns the Root View Used in API. 
+   * Returns the Root View Used in API.
    *
    * @see API#addViewAtRoot(View)
    */
