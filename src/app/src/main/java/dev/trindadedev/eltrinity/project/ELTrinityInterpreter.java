@@ -122,7 +122,7 @@ public class ELTrinityInterpreter extends Interpreter {
     }
 
     if (!file.exists()) {
-      addErrorLog(file.getAbsoultePath() + " File Not Exists!\n");
+      addErrorLog(file.getAbsolutePath() + " File Not Exists!\n");
       return;
     }
 
