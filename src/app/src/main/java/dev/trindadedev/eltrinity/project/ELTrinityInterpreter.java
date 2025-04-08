@@ -19,8 +19,10 @@ package dev.trindadedev.eltrinity.project;
 import android.content.Context;
 import bsh.EvalError;
 import bsh.Interpreter;
+import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.utils.FileUtil;
 import dev.trindadedev.eltrinity.project.api.API;
+import dev.trindadedev.eltrinity.project.manage.ProjectManager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +63,7 @@ public class ELTrinityInterpreter extends Interpreter {
     addTaskLog("Environment variables defined.");
   }
 
-  public void setProject(final Project project) {
+  public void setProject(final ProjectBean project) {
     this.project = project;
     api = new API(context, this, project);
     projectPath = new File(ProjectManager.getProjectsFile(), project.basicInfo.name);
@@ -81,7 +83,22 @@ public class ELTrinityInterpreter extends Interpreter {
 
   /** Compiles main file of project. */
   public void runProjectMain() throws EvalError {
-    runFile(getProjectMainFile());
+    final File file = getProjectMainFile();
+    final String name = file.getName();
+    if (name.endsWith(".bsh")) {
+      runBSHFile(file);
+    } else if (name.endsWith(".c")) {
+      runCFile(file);
+    }
+  }
+
+  /** Converts the C lang code to BeanShell Code and compile it. */
+  protected void runCFile(final File file) throws EvalError {
+    final String cCode = FileUtil.readFile(file);
+    final String bshCode = C2BSH.convert(cCode);
+    final File bshFile = new File(projectPath, "build/" + file.getName() + ".bsh");
+    FileUtil.writeText(bshFile, bshCode);
+    runBSHFile(bshFile);
   }
 
   /** Compiles an file of Project. */
