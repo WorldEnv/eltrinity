@@ -39,10 +39,6 @@ public class API {
   }
 
   public API(final Context context, final ELTrinityInterpreter interpreter) {
-    this(context, interpreter, null);
-  }
-
-  public API(final Context context, final ELTrinityInterpreter interpreter) {
     this(context, interpreter, new LifecycleEvents());
   }
 
