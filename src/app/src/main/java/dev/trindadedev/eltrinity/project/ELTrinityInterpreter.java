@@ -68,6 +68,12 @@ public class ELTrinityInterpreter extends Interpreter {
 
   public void setProject(final ProjectBean project) throws EvalError {
     this.project = project;
+
+    if (project == null || project.basicInfo == null || project.basicInfo.name == null) {
+      addErrorLog("Invalid project data: basicInfo or name is null");
+      throw new EvalError("Invalid project: project name is null");
+    }
+
     projectPath = new File(ProjectManager.getProjectsFile(), project.basicInfo.name);
     configureVariables();
   }
