@@ -29,13 +29,13 @@ public class ProjectBasicInfoBean extends BaseBean implements Parcelable {
   public ArrayList<String> files;
 
   @SerializedName("project_description")
-  private String description;
+  public String description;
 
   @SerializedName("project_author_name")
-  private String authorName;
+  public String authorName;
 
   @SerializedName("project_author_user_name")
-  private String authorUserName;
+  public String authorUserName;
 
   public ProjectBasicInfoBean() {}
 
