@@ -66,7 +66,7 @@ public class ELTrinityInterpreter extends Interpreter {
     addTaskLog("Environment variables defined.");
   }
 
-  public void setProject(final ProjectBean project) {
+  public void setProject(final ProjectBean project) throws EvalError {
     this.project = project;
     projectPath = new File(ProjectManager.getProjectsFile(), project.basicInfo.name);
     configureVariables();
