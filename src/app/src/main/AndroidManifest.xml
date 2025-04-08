@@ -10,8 +10,7 @@
     android:roundIcon="@mipmap/ic_launcher"
     android:label="@string/app_name"
     android:supportsRtl="true"
-    android:theme="@style/Theme.ELTrinity"
-    android:name="dev.trindadedev.blockode.ELTrinity">
+    android:theme="@style/Theme.ELTrinity">
     <activity
       android:name="dev.trindadedev.eltrinity.ui.activities.MainActivity"
       android:exported="true">
