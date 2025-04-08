@@ -17,17 +17,21 @@ public class ProjectBean extends BaseBean implements Parcelable {
         }
       };
 
+  public String projectFolderPath;
   public ProjectBasicInfoBean basicInfo;
 
   public ProjectBean() {
+    projectFolderPath = "";
     basicInfo = new ProjectBasicInfoBean();
   }
 
   public ProjectBean(final Parcel parcel) {
+    projectFolderPath = parcel.readString();
     basicInfo = ParcelUtil.readParcelable(parcel, ProjectBasicInfoBean.class);
   }
 
   public void copy(final ProjectBean other) {
+    projectFolderPath = other.projectFolderPath;
     basicInfo = other.basicInfo;
   }
 
@@ -48,6 +52,7 @@ public class ProjectBean extends BaseBean implements Parcelable {
 
   @Override
   public void writeToParcel(final Parcel parcel, final int flags) {
+    parcel.writeString(projectFolderPath);
     parcel.writeParcelable(basicInfo, flags);
   }
 }
