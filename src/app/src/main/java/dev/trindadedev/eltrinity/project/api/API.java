@@ -22,28 +22,37 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
-import dev.trindadedev.eltrinity.project.Project;
+import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
 import dev.trindadedev.eltrinity.project.Event;
 import dev.trindadedev.eltrinity.project.Events;
 
 public class API {
 
-  public Project project;
   public LifecycleEvents lifecycleEvents;
 
   private ELTrinityInterpreter interpreter;
   private Context context;
 
   public API(final Context context) {
-    this.context = context;
-    this.project = new Project();
-    this.lifecycleEvents = new LifecycleEvents();
+    this(context, null);
   }
 
   public API(final Context context, final ELTrinityInterpreter interpreter) {
-    this(context);
+    this(context, interpreter, null);
+  }
+
+  public API(final Context context, final ELTrinityInterpreter interpreter) {
+    this(context, interpreter, new LifecycleEvents());
+  }
+
+  public API(final Context context,
+    final ELTrinityInterpreter interpreter,
+    final LifecycleEvents lifecycleEvents) {
+
+    this.context = context;
     this.interpreter = interpreter;
+    this.lifecycleEvents = lifecycleEvents;
   }
 
   public BaseAPIActivity contextAsBaseAPIActivity() {
@@ -130,9 +139,5 @@ public class API {
     public void setOnPostCreate(final Event onPostCreate) {
       this.onStart = onStart;
     }
-  }
-
-  public enum Version {
-    One;
   }
 }

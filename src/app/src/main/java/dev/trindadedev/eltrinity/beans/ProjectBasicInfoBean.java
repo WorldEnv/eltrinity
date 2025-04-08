@@ -28,18 +28,33 @@ public class ProjectBasicInfoBean extends BaseBean implements Parcelable {
   @SerializedName("project_files")
   public ArrayList<String> files;
 
+  @SerializedName("project_description")
+  private String description;
+
+  @SerializedName("project_author_name")
+  private String authorName;
+
+  @SerializedName("project_author_user_name")
+  private String authorUserName;
+
   public ProjectBasicInfoBean() {}
 
   public ProjectBasicInfoBean(final Parcel parcel) {
     name = parcel.readString();
     language = parcel.readString();
     files = (ArrayList) parcel.readSerializable();
+    description = parcel.readString();
+    authorName = parcel.readString();
+    authorUserName = parcel.readString();
   }
 
   public void copy(final ProjectBasicInfoBean other) {
     name = other.name;
     language = other.language;
     files = other.files;
+    description = other.description;
+    authorName = other.authorName;
+    authorUserName = other.authorUserName;
   }
 
   @Override
@@ -57,6 +72,9 @@ public class ProjectBasicInfoBean extends BaseBean implements Parcelable {
     PrintUtil.print(name);
     PrintUtil.print(language);
     PrintUtil.print(files);
+    PrintUtil.print(description);
+    PrintUtil.print(authorName);
+    PrintUtil.print(authorUserName);
   }
 
   @Override
@@ -64,5 +82,8 @@ public class ProjectBasicInfoBean extends BaseBean implements Parcelable {
     parcel.writeString(name);
     parcel.writeString(language);
     parcel.writeSerializable(files);
+    parcel.writeString(description);
+    parcel.writeString(authorName);
+    parcel.writeString(authorUserName);
   }
 }

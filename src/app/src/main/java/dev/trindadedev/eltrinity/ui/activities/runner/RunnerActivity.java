@@ -84,16 +84,14 @@ public class RunnerActivity extends BaseAPIActivity {
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
     super.onPostBind(savedInstanceState);
     try {
-      final String projectName = runnerState.project.basicInfo.name;
-      final File projectPath = new File(ProjectManager.getProjectsFile(), projectName);
-
       final ELTrinityInterpreter.InterpreterEvents interpreterEvents =
           new ELTrinityInterpreter.InterpreterEvents();
 
       interpreterEvents.setOnLogAdded(this::updateLogsUI);
 
-      interpreter.setProjectPath(projectPath);
+      interpreter.setProject(runnerState.project);
       interpreter.setEvents(interpreterEvents);
+
       interpreter.runProjectMain();
       interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
 

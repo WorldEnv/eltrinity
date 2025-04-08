@@ -41,82 +41,90 @@ public class ELTrinityInterpreter extends Interpreter {
   protected API api;
 
   public ELTrinityInterpreter(final Context context) throws EvalError {
+    this(context, new ProjectBean(), new InterpreterEvents());
+  }
+
+  public ELTrinityInterpreter(final Context context, final ProjectBean project) throws EvalError {
+    this(context, project, new InterpreterEvents());
+  }
+
+  public ELTrinityInterpreter(final Context context,
+    final ProjectBean project, final InterpreterEvents events,
+  ) throws EvalError {
     super();
-    this.context = context;
     this.logs = new ArrayList<>();
-    this.events = new InterpreterEvents();
-    this.api = new API(context, this);
+    this.context = context;
+    this.api = new API(context, this, project);
+    this.events = events;
+    setProject(project);
+    configureVariables();
+    addTaskLog("Environment variables defined.");
+  }
+
+  public void setProject(final Project project) {
+    this.project = project;
+    api = new API(context, this, project);
+    projectPath = new File(ProjectManager.getProjectsFile(), project.basicInfo.name);
     configureVariables();
   }
 
-  public ELTrinityInterpreter(final Context context, final File projectPath) throws EvalError {
-    this(context, projectPath, new InterpreterEvents());
-  }
-
-  public ELTrinityInterpreter(final Context context, final File projectPath, InterpreterEvents events)
-      throws EvalError {
-    this(context);
-    setProjectPath(projectPath);
-    setEvents(events);
-  }
-
-  public void setProjectPath(File projectPath) {
-    this.projectPath = projectPath;
-  }
-
-  public void setEvents(InterpreterEvents events) {
+  public void setEvents(final InterpreterEvents events) {
     this.events = events;
   }
 
   private void configureVariables() throws EvalError {
-    set("projectPath", projectPath);
     set("context", context);
+    set("project", project);
+    set("projectPath", projectPath);
     set("api", api);
-    addTaskLog("Environment variables defined.");
   }
 
-  /** Compiles the main file of Project. */
+  /** Compiles main file of project. */
   public void runProjectMain() throws EvalError {
+    runFile(getProjectMainFile());
+  }
+
+  /** Compiles an file of Project. */
+  protected void runBSHFile(final File file) throws EvalError {
+    if (project == null) {
+      addErrorLog("Project not loaded successfully!");
+      return;
+    }
+
     if (projectPath == null) {
       addErrorLog("Project path is not set!");
       return;
     }
 
-    if (!getProjectMainFile().exists()) {
-      addErrorLog("Project main.bsh File Not Exists!\n");
+    if (!file.exists()) {
+      addErrorLog(file.getName() + " File Not Exists!\n");
       return;
     }
 
-    final String projectMainContent = FileUtil.readFile(getProjectMainFile());
+    final String fileContent = FileUtil.readFile(file);
 
-    if (projectMainContent.isEmpty()) {
-      addErrorLog("Empty Project main.bsh File!\n");
+    if (fileContent.isEmpty()) {
+      addErrorLog(file.getName() + " is Empty File!\n");
       return;
     }
-    eval(projectMainContent);
+    eval(fileContent);
 
     addSuccessLog("Compiled successfully!");
 
-    if (api.project.getName() == null || api.project.getName().isEmpty()) {
+    if (api.project.basicInfo.name == null || api.project.basicInfo.name.isEmpty()) {
       addWarningLog("Please provide Project Name");
     } else {
-      addInfoLog("Running " + api.project.getName() + "...");
+      addInfoLog("Running " + api.project.basicInfo.name + "...");
     }
 
-    if (api.project.getDescription() == null || api.project.getDescription().isEmpty()) {
+    if (api.project.basicInfo.description == null || api.project.basicInfo.description.isEmpty()) {
       addWarningLog("Please provide Project Description");
     } else {
-      addInfoLog("Project Description: " + api.project.getDescription());
+      addInfoLog("Project Description: " + api.project.basicInfo.description);
     }
 
-    if (api.project.getApiVersion() == null) {
-      addWarningLog("Please declare the API version of your project");
-    } else {
-      addInfoLog("Project API Version: " + api.project.getApiVersion().toString());
-    }
-
-    final String authorName = api.project.getAuthorName();
-    final String authorUserName = api.project.getAuthorUserName();
+    final String authorName = api.project.basicInfo.authorName;
+    final String authorUserName = api.project.basicInfo.authorUserName;
 
     if ((authorName == null || authorName.isEmpty())
         && (authorUserName == null || authorUserName.isEmpty())) {
@@ -167,6 +175,10 @@ public class ELTrinityInterpreter extends Interpreter {
 
   public API getAPI() {
     return api;
+  }
+
+  public InterpreterEvents getInterpreterEvents() {
+    return events;
   }
 
   public API.LifecycleEvents getProjectLifecycleEvents() {
