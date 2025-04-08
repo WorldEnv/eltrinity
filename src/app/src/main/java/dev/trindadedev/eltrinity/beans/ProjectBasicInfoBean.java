@@ -37,7 +37,13 @@ public class ProjectBasicInfoBean extends BaseBean implements Parcelable {
   @SerializedName("project_author_user_name")
   public String authorUserName;
 
-  public ProjectBasicInfoBean() {}
+  public ProjectBasicInfoBean() {
+    name = "";
+    files = new ArrayList<>();
+    description = "";
+    authorName = "";
+    authorUserName = "";
+  }
 
   public ProjectBasicInfoBean(final Parcel parcel) {
     name = parcel.readString();
