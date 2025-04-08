@@ -29,8 +29,8 @@ public class ProjectsAdapter extends ListAdapter<File, ProjectsAdapter.ProjectsA
   @NonNull
   public void onBindViewHolder(@NonNull ProjectsAdapterViewHolder holder, int position) {
     var item = getItem(position); // project folder
-    // try load project data based in folder name.
-    var project = ProjectManager.getProjectByScId(item.getName());
+    // try load project data based in folder.
+    var project = ProjectManager.getProjectByPath(item);
     assert project != null;
     holder.binding.name.setText(project.basicInfo.name);
     holder.binding.dec.setText(project.basicInfo.mainClassPackage);

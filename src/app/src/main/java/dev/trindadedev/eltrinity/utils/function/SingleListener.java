@@ -1,4 +1,4 @@
-package dev.trindadedev.blockode.utils.function;
+package dev.trindadedev.eltrinity.utils.function;
 
 public interface SingleListener {
   void call();

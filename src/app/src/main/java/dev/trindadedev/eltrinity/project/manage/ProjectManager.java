@@ -37,8 +37,8 @@ public class ProjectManager extends Contextualizable {
    * @param path the source path.
    */
   @Nullable
-  public static final ProjectBean getProjectByPath(final String path) {
-    var name = path.substring(path.lastIndexOf("."));
+  public static final ProjectBean getProjectByPath(final File file) {
+    var name = path.substring(file.getAbsolutePath().lastIndexOf("."));
     var project = new ProjectBean();
 
     var projectBasicInfoFileJsonType =
@@ -48,7 +48,7 @@ public class ProjectManager extends Contextualizable {
     var projectBasicInfo =
       GsonUtil.getGson().fromJson(projectBasicInfoJsonContent, projectBasicInfoFileJsonType);
 
-    project.basicInfo = projectBasicInfo;
+    project.basicInfo = (ProjectBasicInfo) projectBasicInfo;
     return project;
   }
 
@@ -58,11 +58,11 @@ public class ProjectManager extends Contextualizable {
    * @param project The instance of ProjectBean with data to be created.
    */
   public static final void createProjectByBean(@NonNull final ProjectBean project) {
-    final var projectPath = new File(getProjectsFile(), projectName);
+    final var projectPath = new File(getProjectsFile(), project.basicInfo.name);
     final var projectBasicInfo = project.basicInfo;
     final var projectBasicInfoJson = GsonUtil.getGson().toJson(projectBasicInfo);
     FileUtil.makeDir(projectPath);
-    FileUtil.writeFile(getBasicInfoFile(projectBasicInfo.name), projectBasicInfoJson);
+    FileUtil.writeText(getBasicInfoFile(projectBasicInfo.name), projectBasicInfoJson);
   }
 
   /** Folder where all projects are stored */

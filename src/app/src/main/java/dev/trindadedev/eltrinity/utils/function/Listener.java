@@ -1,4 +1,4 @@
-package dev.trindadedev.blockode.utils.function;
+package dev.trindadedev.eltrinity.utils.function;
 
 @FunctionalInterface
 public interface Listener<T> {

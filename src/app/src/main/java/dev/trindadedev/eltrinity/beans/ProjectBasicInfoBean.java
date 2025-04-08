@@ -37,7 +37,7 @@ public class ProjectBasicInfoBean extends BaseBean implements Parcelable {
   }
 
   public void copy(final ProjectBasicInfoBean other) {
-    files = other.name;
+    name = other.name;
     language = other.language;
     files = other.files;
   }
@@ -63,6 +63,6 @@ public class ProjectBasicInfoBean extends BaseBean implements Parcelable {
   public void writeToParcel(final Parcel parcel, final int flags) {
     parcel.writeString(name);
     parcel.writeString(language);
-    parcel.writeString(files);
+    parcel.writeSerializable(files);
   }
 }
