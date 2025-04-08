@@ -38,7 +38,7 @@ public class ProjectManager extends Contextualizable {
    */
   @Nullable
   public static final ProjectBean getProjectByPath(final File file) {
-    var name = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf("."));
+    var name = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf("/") + 1);
     var project = new ProjectBean();
 
     var projectBasicInfoFileJsonType =
