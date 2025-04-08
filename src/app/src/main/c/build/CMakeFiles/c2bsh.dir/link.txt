@@ -1,0 +1,1 @@
+/data/data/com.termux/files/usr/bin/cc -fPIC -O2 -g -DNDEBUG -Xlinker --dependency-file=CMakeFiles/c2bsh.dir/link.d -shared -Wl,-soname,libc2bsh.so -o libc2bsh.so CMakeFiles/c2bsh.dir/android/android_main.c.o CMakeFiles/c2bsh.dir/converter.c.o CMakeFiles/c2bsh.dir/file_util.c.o CMakeFiles/c2bsh.dir/str_util.c.o

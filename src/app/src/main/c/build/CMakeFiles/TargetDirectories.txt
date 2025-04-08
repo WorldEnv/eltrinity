@@ -1,0 +1,3 @@
+/storage/emulated/0/.projects/eltrinity/src/app/src/main/c/build/CMakeFiles/c2bsh.dir
+/storage/emulated/0/.projects/eltrinity/src/app/src/main/c/build/CMakeFiles/edit_cache.dir
+/storage/emulated/0/.projects/eltrinity/src/app/src/main/c/build/CMakeFiles/rebuild_cache.dir
