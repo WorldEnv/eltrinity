@@ -21,6 +21,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.utils.FileUtil;
+import dev.trindadedev.eltrinity.c2bsh.C2BSH;
 import dev.trindadedev.eltrinity.project.api.API;
 import dev.trindadedev.eltrinity.project.manage.ProjectManager;
 import java.io.File;
@@ -41,6 +42,7 @@ public class ELTrinityInterpreter extends Interpreter {
   protected File projectPath;
   protected List<String> logs;
   protected API api;
+  protected ProjectBean project;
 
   public ELTrinityInterpreter(final Context context) throws EvalError {
     this(context, new ProjectBean(), new InterpreterEvents());
@@ -56,7 +58,7 @@ public class ELTrinityInterpreter extends Interpreter {
     super();
     this.logs = new ArrayList<>();
     this.context = context;
-    this.api = new API(context, this, project);
+    this.api = new API(context, this);
     this.events = events;
     setProject(project);
     configureVariables();
@@ -65,7 +67,6 @@ public class ELTrinityInterpreter extends Interpreter {
 
   public void setProject(final ProjectBean project) {
     this.project = project;
-    api = new API(context, this, project);
     projectPath = new File(ProjectManager.getProjectsFile(), project.basicInfo.name);
     configureVariables();
   }
