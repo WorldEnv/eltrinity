@@ -77,14 +77,14 @@ public class RunnerActivity extends BaseAPIActivity {
   @Override
   protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
     super.onBindLayout(savedInstanceState);
-    configureData();
+    configureData(savedInstanceState);
   }
 
   @Override
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
     super.onPostBind(savedInstanceState);
     try {
-      final String projectName = editorState.project.basicInfo.name;
+      final String projectName = runnerState.project.basicInfo.name;
       final File projectPath = new File(ProjectManager.getProjectsFile(), projectName);
 
       final ELTrinityInterpreter.InterpreterEvents interpreterEvents =

@@ -21,7 +21,7 @@
       </intent-filter>
     </activity>
 
-    <activity android:name="dev.trindadedev.eltrinity.ui.activities.RunnerActivity" />
+    <activity android:name="dev.trindadedev.eltrinity.ui.activities.runner.RunnerActivity" />
 
   </application>
 </manifest>
