@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.event;
+package dev.trindadedev.eltrinity.os;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -16,7 +16,6 @@ package dev.trindadedev.eltrinity.event;
  * limitations under the License.
  */
 
-@FunctionalInterface
-public interface Event {
-  void onCallEvent();
+public enum PermissionType {
+  STORAGE;
 }

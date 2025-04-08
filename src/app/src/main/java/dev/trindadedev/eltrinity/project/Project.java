@@ -16,6 +16,8 @@ package dev.trindadedev.eltrinity.project;
  * limitations under the License.
  */
 
+import dev.trindadedev.eltrinity.project.api.API;
+
 public class Project {
   private String name;
   private String description;

@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.project;
+package dev.trindadedev.eltrinity.project.api;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -22,9 +22,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
-import dev.trindadedev.eltrinity.app.ELTrinityActivity;
-import dev.trindadedev.eltrinity.event.Event;
-import dev.trindadedev.eltrinity.event.Events;
+import dev.trindadedev.eltrinity.project.Project;
+import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
+import dev.trindadedev.eltrinity.project.Event;
+import dev.trindadedev.eltrinity.project.Events;
 
 public class API {
 
@@ -45,17 +46,17 @@ public class API {
     this.interpreter = interpreter;
   }
 
-  public ELTrinityActivity contextAsELTrinityActivity() {
-    if (context instanceof ELTrinityActivity) {
-      return (ELTrinityActivity) context;
+  public BaseAPIActivity contextAsBaseAPIActivity() {
+    if (context instanceof BaseAPIActivity) {
+      return (BaseAPIActivity) context;
     }
-    throw new IllegalStateException("API Must be instantiated by ELTrinityActivity.");
+    throw new IllegalStateException("API Must be instantiated by BaseAPIActivity.");
   }
 
   public void addViewAtRoot(final View view) {
-    final ViewGroup rootView = contextAsELTrinityActivity().getRootViewForApi();
+    final ViewGroup rootView = contextAsBaseAPIActivity().getRootViewForApi();
     if (rootView == null) {
-      addErrorLog("Failed to add view: Root view of ELTrinityActivity is not initialized.");
+      addErrorLog("Failed to add view: Root view of BaseAPIActivity is not initialized.");
       return;
     }
     rootView.addView(view);

@@ -25,16 +25,17 @@ import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.ViewGroup;
+import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import bsh.EvalError;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dev.trindadedev.eltrinity.databinding.ActivityRunnerBinding;
-import dev.trindadedev.eltrinity.app.ELTrinityActivity;
+import dev.trindadedev.eltrinity.project.api.BaseAPIActivity;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
 import java.io.File;
 
-public class RunnerActivity extends ELTrinityActivity {
+public class RunnerActivity extends BaseAPIActivity {
 
   @NonNull
   private ActivityRunnerBinding binding;
@@ -63,11 +64,15 @@ public class RunnerActivity extends ELTrinityActivity {
   }
 
   @Override
-  protected void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  @NonNull
+  protected View bindLayout() {
     binding = ActivityRunnerBinding.inflate(getLayoutInflater());
-    setContentView(binding.getRoot());
+    return binding.getRoot();
+  }
 
+  @Override
+  protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
+    super.onBindLayout(savedInstanceState);
     try {
       final String projectName = getIntent().getStringExtra("project_name");
       final File projectPath = new File(ELTrinityInterpreter.PROJECTS_PATH, projectName);
@@ -82,7 +87,7 @@ public class RunnerActivity extends ELTrinityActivity {
       interpreter.runProjectMain();
       interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
 
-    } catch (EvalError e) {
+    } catch (final EvalError e) {
       showErrorDialog("Error: " + e.getMessage());
     }
   }

@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.c2bsh;
+package dev.trindadedev.eltrinity.utils;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -16,10 +16,15 @@ package dev.trindadedev.eltrinity.c2bsh;
  * limitations under the License.
  */
 
-public class C2BSH {
-  static {
-    System.loadLibrary("c2bsh");
-  }
+import java.util.ArrayList;
+import java.util.List;
 
-  public native String convert(final String c_code);
+public class PrintUtil {
+
+  private static final List<String> allLogs = new ArrayList<>();
+
+  public static void print(final Object toPrint) {
+    allLogs.add(String.valueOf(toPrint));
+    System.out.print(toPrint);
+  }
 }

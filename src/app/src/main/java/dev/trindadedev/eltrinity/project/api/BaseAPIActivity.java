@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.app;
+package dev.trindadedev.eltrinity.project.api;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -17,15 +17,18 @@ package dev.trindadedev.eltrinity.app;
  */
 
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
-import androidx.appcompat.app.AppCompatActivity;
+import android.widget.LinearLayout;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import dev.trindadedev.eltrinity.ui.base.BaseAppCompatActivity;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
 
-public abstract class ELTrinityActivity extends AppCompatActivity {
+public abstract class BaseAPIActivity extends BaseAppCompatActivity {
 
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
     requireInterpreter().getProjectLifecycleEvents().onCreate.onCallEvent();
   }
 
@@ -80,6 +83,7 @@ public abstract class ELTrinityActivity extends AppCompatActivity {
    *
    * @see API#addViewAtRoot(View)
    */
+  @Nullable
   public ViewGroup getRootViewForApi() {
     return null;
   }

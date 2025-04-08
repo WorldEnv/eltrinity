@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.event;
+package dev.trindadedev.eltrinity.os;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -16,11 +16,7 @@ package dev.trindadedev.eltrinity.event;
  * limitations under the License.
  */
 
-public abstract class Events {
-  protected final Event emptyEvent() {
-    return new Event() {
-      @Override
-      public void onCallEvent() {}
-    };
-  }
+public enum PermissionStatus {
+  GRANTED,
+  DENIED;
 }

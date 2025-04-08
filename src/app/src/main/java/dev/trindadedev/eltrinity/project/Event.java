@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.c2bsh;
+package dev.trindadedev.eltrinity.project;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -16,10 +16,7 @@ package dev.trindadedev.eltrinity.c2bsh;
  * limitations under the License.
  */
 
-public class C2BSH {
-  static {
-    System.loadLibrary("c2bsh");
-  }
-
-  public native String convert(final String c_code);
+@FunctionalInterface
+public interface Event {
+  void onCallEvent();
 }

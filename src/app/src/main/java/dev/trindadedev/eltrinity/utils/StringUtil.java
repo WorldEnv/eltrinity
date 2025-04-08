@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.ui.activities;
+package dev.trindadedev.eltrinity.utils;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -16,27 +16,14 @@ package dev.trindadedev.eltrinity.ui.activities;
  * limitations under the License.
  */
 
-import android.os.Bundle;
-import android.view.View;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import dev.trindadedev.eltrinity.ui.base.BaseAppCompatActivity;
-import dev.trindadedev.eltrinity.databinding.ActivityMainBinding;
+import androidx.annotation.StringRes;
+import dev.trindadedev.eltrinity.ELTrinity;
 
-public class MainActivity extends BaseAppCompatActivity {
+public class StringUtil {
 
   @NonNull
-  private ActivityMainBinding binding;
-
-  @Override
-  @NonNull
-  protected View bindLayout() {
-    binding = ActivityMainBinding.inflate(getLayoutInflater());
-    return binding.getRoot();
-  }
-
-  @Override
-  protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
-    // show list of projects and more
+  public static final String getString(@StringRes int stringResId) {
+    return ELTrinity.getAppContext().getString(stringResId);
   }
 }
