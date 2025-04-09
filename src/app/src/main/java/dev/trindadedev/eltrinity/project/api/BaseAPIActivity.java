@@ -95,9 +95,9 @@ public abstract class BaseAPIActivity extends BaseAppCompatActivity {
     }
   }
 
-  protected abstract ELTrinityInterpreter getInterpreter();
+  protected abstract ELTrinityInterpreter getInterpreter() throws EvalError;
 
-  protected final ELTrinityInterpreter requireInterpreter() {
+  protected final ELTrinityInterpreter requireInterpreter() throws EvalError {
     final ELTrinityInterpreter interpreter = getInterpreter();
     if (interpreter == null) {
       throw new IllegalStateException("ELTrinityInterpreter has not been initialized.");

@@ -45,13 +45,9 @@ public class RunnerActivity extends BaseAPIActivity {
 
   @Override
   @NonNull
-  protected ELTrinityInterpreter getInterpreter() {
+  protected ELTrinityInterpreter getInterpreter() throws EvalError {
     if (interpreter == null) {
-      try {
-        interpreter = new ELTrinityInterpreter(this);
-      } catch (EvalError exc) {
-        showErrorDialog(exc.toString());
-      }
+      interpreter = new ELTrinityInterpreter(this);
     }
     return interpreter;
   }
