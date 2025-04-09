@@ -4,9 +4,10 @@
  * in 2025-04-08
  */
 
+#include "config.h"
 #include "log.h"
 
-#ifdef __ANDROID__
+#if PROJECT_ANDROID_BUILD
 
 #include "android/android_log.h"
 

@@ -1,0 +1,1 @@
+#define PROJECT_ANDROID_BUILD false

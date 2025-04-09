@@ -14,6 +14,8 @@ project(${PROJECT_NAME})
 # and want the exe instead libc2bsh.so.
 set(PROJECT_ANDROID_BUILD true)
 
+configure_file(${PROJECT_C_FILES}/config.h.in ../${PROJECT_C_FILES}/config.h.in)
+
 if (PROJECT_ANDROID_BUILD)
   # source files (.c)
   set (SOURCE_FILES
