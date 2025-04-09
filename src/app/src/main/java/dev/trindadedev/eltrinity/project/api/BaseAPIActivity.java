@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.Nullable;
+import bsh.EvalError;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
 import dev.trindadedev.eltrinity.ui.base.BaseAppCompatActivity;
 
@@ -27,43 +28,71 @@ public abstract class BaseAPIActivity extends BaseAppCompatActivity {
 
   @Override
   protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
-    requireInterpreter().getProjectLifecycleEvents().onCreate.onCallEvent();
+    try {
+      requireInterpreter().getProjectLifecycleEvents().onCreate.onCallEvent();
+    } catch (EvalError e) {
+      onBSHError(e);
+    }
   }
 
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    requireInterpreter().getProjectLifecycleEvents().onDestroy.onCallEvent();
+    try {
+      requireInterpreter().getProjectLifecycleEvents().onDestroy.onCallEvent();
+    } catch (EvalError e) {
+      onBSHError(e);
+    }
   }
 
   @Override
   protected void onResume() {
     super.onResume();
-    requireInterpreter().getProjectLifecycleEvents().onResume.onCallEvent();
+    try {
+      requireInterpreter().getProjectLifecycleEvents().onResume.onCallEvent();
+    } catch (EvalError e) {
+      onBSHError(e);
+    }
   }
 
   @Override
   protected void onStart() {
     super.onStart();
-    requireInterpreter().getProjectLifecycleEvents().onStart.onCallEvent();
+    try {
+      requireInterpreter().getProjectLifecycleEvents().onStart.onCallEvent();
+    } catch (EvalError e) {
+      onBSHError(e);
+    }
   }
 
   @Override
   protected void onPause() {
     super.onPause();
-    requireInterpreter().getProjectLifecycleEvents().onPause.onCallEvent();
+    try {
+      requireInterpreter().getProjectLifecycleEvents().onPause.onCallEvent();
+    } catch (EvalError e) {
+      onBSHError(e);
+    }
   }
 
   @Override
   protected void onStop() {
     super.onStop();
-    requireInterpreter().getProjectLifecycleEvents().onStop.onCallEvent();
+    try {
+      requireInterpreter().getProjectLifecycleEvents().onStop.onCallEvent();
+    } catch (EvalError e) {
+      onBSHError(e);
+    }
   }
 
   @Override
   protected void onPostCreate(Bundle savedInstanceState) {
     super.onPostCreate(savedInstanceState);
-    requireInterpreter().getProjectLifecycleEvents().onPostCreate.onCallEvent();
+    try {
+      requireInterpreter().getProjectLifecycleEvents().onPostCreate.onCallEvent();
+    } catch (EvalError e) {
+      onBSHError(e);
+    }
   }
 
   protected abstract ELTrinityInterpreter getInterpreter();
@@ -85,4 +114,6 @@ public abstract class BaseAPIActivity extends BaseAppCompatActivity {
   public ViewGroup getRootViewForApi() {
     return null;
   }
+
+  protected abstract void onBSHError(final EvalError e);
 }

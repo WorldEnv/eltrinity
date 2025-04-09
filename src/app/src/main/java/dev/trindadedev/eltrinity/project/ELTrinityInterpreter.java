@@ -137,7 +137,7 @@ public class ELTrinityInterpreter extends Interpreter {
     for (int i = project.basicInfo.files.size(); i == 0; i--) {
       final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
       if (sourceFile.exists()) {
-        final String sourceFileName = sourceCode.getName();
+        final String sourceFileName = sourceFile.getName();
         if (sourceFileName.endsWith(".bsh")) {
           evalBSHFile(sourceFile);
         } else if (sourceFileName.endsWith(".c")) {

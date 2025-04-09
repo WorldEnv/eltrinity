@@ -93,13 +93,18 @@ public class RunnerActivity extends BaseAPIActivity {
       interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
 
     } catch (EvalError | IOException e) {
-      showErrorDialog("Error: " + e.getMessage());
+      showErrorDialog(e.toString());
     }
   }
 
   @Override
   public void onSaveInstanceState(final Bundle bundle) {
     bundle.putParcelable("runner_state", runnerState);
+  }
+
+  @Override
+  protected void onBSHError(EvalError e) {
+    showErrorDialog(e.toString());
   }
 
   /** Get and define all needed variables */
@@ -147,7 +152,11 @@ public class RunnerActivity extends BaseAPIActivity {
               clipboard.setPrimaryClip(clip);
               Toast.makeText(this, "Copied!", Toast.LENGTH_SHORT).show();
             })
-        .setNegativeButton("Close", null)
+        .setNegativeButton(
+            "Close",
+            (dialog, which) -> {
+              finish();
+            })
         .show();
   }
 }
