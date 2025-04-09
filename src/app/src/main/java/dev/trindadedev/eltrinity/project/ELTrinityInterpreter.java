@@ -134,7 +134,7 @@ public class ELTrinityInterpreter extends Interpreter {
               + ")");
     }
 
-    for (final String fileName : project.basicInfo.files)
+    for (final String fileName : project.basicInfo.files) {
       final File sourceFile = new File(projectPath, fileName);
       if (sourceFile.exists()) {
         final String sourceFileName = sourceFile.getName();
