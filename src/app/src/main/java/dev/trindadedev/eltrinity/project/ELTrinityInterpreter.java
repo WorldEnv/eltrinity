@@ -137,15 +137,11 @@ public class ELTrinityInterpreter extends Interpreter {
     for (int i = project.basicInfo.files.size(); i == 0; i--) {
       final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
       if (sourceFile.exists()) {
-        final String sourceCode = FileUtil.readFile(sourceFile);
-        if (sourceCode.isEmpty()) {
-          addErrorLog(sourceFile.getAbsolutePath() + " Is Empty!");
-          return;
-        }
+        final String sourceFileName = sourceCode.getName();
         if (sourceFileName.endsWith(".bsh")) {
           evalBSHFile(sourceFile);
-        } else {
-          evalBSHCode();
+        } else if (sourceFileName.endsWith(".c")) {
+          evalCFile(sourceFile);
         }
       } else {
         addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
