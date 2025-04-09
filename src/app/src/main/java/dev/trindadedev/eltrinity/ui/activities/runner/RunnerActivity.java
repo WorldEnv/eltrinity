@@ -91,7 +91,7 @@ public class RunnerActivity extends BaseAPIActivity {
       interpreter.runProject();
       interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
 
-    } catch (final EvalError || IOException e) {
+    } catch (EvalError | IOException e) {
       showErrorDialog("Error: " + e.getMessage());
     }
   }
