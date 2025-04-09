@@ -143,7 +143,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     startActivity(new Intent(this, activity));
   }
 
-  protected final void showStoragePermission(final Event afterAllow) {
+  protected final void showStoragePermissionDialog(final Event afterAllow) {
     if (storagePermissionManager.check() == PermissionStatus.GRANTED) {
       afterAllow.onCallEvent();
       return;
@@ -157,7 +157,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
       });
   }
 
-  protected final void showOverlayPermission(final Event afterAllow) {
+  protected final void showOverlayPermissionDialog(final Event afterAllow) {
     if (overlayPermissionManager.check() == PermissionStatus.GRANTED) {
       afterAllow.onCallEvent();
       return;
