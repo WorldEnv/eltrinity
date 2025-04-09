@@ -45,6 +45,11 @@ public class MainActivity extends BaseAppCompatActivity {
   }
 
   @Override
+  protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
+    //nah
+  }
+
+  @Override
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
     projectsViewModel = new ViewModelProvider(this).get(ProjectsViewModel.class);
     projectsAdapter = new ProjectsAdapter();
