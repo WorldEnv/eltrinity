@@ -17,5 +17,6 @@ package dev.trindadedev.eltrinity.os;
  */
 
 public enum PermissionType {
-  STORAGE;
+  STORAGE,
+  OVERLAY;
 }

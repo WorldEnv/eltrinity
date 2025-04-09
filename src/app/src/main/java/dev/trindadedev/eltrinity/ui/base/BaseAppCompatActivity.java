@@ -28,12 +28,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import dev.trindadedev.eltrinity.R;
 import dev.trindadedev.eltrinity.os.PermissionManager;
 import dev.trindadedev.eltrinity.os.PermissionStatus;
 import dev.trindadedev.eltrinity.os.PermissionType;
 import dev.trindadedev.eltrinity.ui.components.dialog.ProgressDialog;
 import dev.trindadedev.eltrinity.utils.EdgeToEdge;
 import dev.trindadedev.eltrinity.utils.PrintUtil;
+import dev.trindadedev.eltrinity.utils.StringUtil;
+import dev.trindadedev.eltrinity.project.Event;
 import java.io.Serializable;
 
 @SuppressWarnings("DEPRECATION")
@@ -44,6 +48,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
   @NonNull private View rootView;
   @NonNull private ProgressDialog progressDialog;
   @NonNull protected PermissionManager.Storage storagePermissionManager;
+  @NonNull protected PermissionManager.Overlay overlayPermissionManager;
 
   private final ActivityResultLauncher<Intent> allFilesPermissionLauncher =
       registerForActivityResult(
@@ -59,28 +64,46 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
             onReceive(PermissionType.STORAGE, storagePermissionManager.check());
           });
 
+  private final ActivityResultLauncher<Intent> overlayPermissionLauncher =
+      registerForActivityResult(
+          new ActivityResultContracts.StartActivityForResult(),
+          result -> {
+            onReceive(PermissionType.OVERLAY, overlayPermissionManager.check());
+          });
+
   @Override
   protected void onCreate(@Nullable final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     rootView = bindLayout();
     setContentView(rootView);
     onBindLayout(savedInstanceState);
+    EdgeToEdge.enable(this);
     storagePermissionManager =
         new PermissionManager.Storage(
             this, allFilesPermissionLauncher, readWritePermissionLauncher);
+    overlayPermissionManager = new PermissionManager.Overlay(this, overlayPermissionLauncher);
     progressDialog = new ProgressDialog(this);
-    onPostBind(savedInstanceState);
+    
+    showStoragePermissionDialog(() -> {
+      showOverlayPermissionDialog(() -> {
+        // when add more permissions
+        // call onPostBind after the last permission allow
+        onPostBind(savedInstanceState);
+      });
+    });
   }
 
+  // should return the root view of screen layout
   @NonNull
   protected abstract View bindLayout();
 
+  // called just after bind the layout with the setContentView
   protected abstract void onBindLayout(@Nullable final Bundle savedInstanceState);
 
+  // this method is more recommended than onBindLayout
+  // its called before all checks, so its better
+  // use onBindLayout just if u need to do something before permission checks.
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
-    if (storagePermissionManager.check() == PermissionStatus.DENIED)
-      storagePermissionManager.request();
-    EdgeToEdge.enable(this);
   }
 
   protected void showProgress() {
@@ -128,6 +151,47 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
   protected final void openActivity(final Class<? extends BaseAppCompatActivity> activity) {
     startActivity(new Intent(this, activity));
+  }
+
+  protected final void showStoragePermissionDialog(final Event afterAllow) {
+    if (storagePermissionManager.check() == PermissionStatus.GRANTED) {
+      afterAllow.onCallEvent();
+      return;
+    }
+    showPermissionDialog(StringUtil.getString(R.string.permission_storage_title),
+      StringUtil.getString(R.string.permission_storage_description),
+      () -> {
+        if (storagePermissionManager.check() == PermissionStatus.DENIED)
+            storagePermissionManager.request();
+        afterAllow.onCallEvent();
+      });
+  }
+
+  protected final void showOverlayPermissionDialog(final Event afterAllow) {
+    if (overlayPermissionManager.check() == PermissionStatus.GRANTED) {
+      afterAllow.onCallEvent();
+      return;
+    }
+    showPermissionDialog(StringUtil.getString(R.string.permission_overlay_title),
+      StringUtil.getString(R.string.permission_overlay_description),
+      () -> {
+        if (overlayPermissionManager.check() == PermissionStatus.DENIED)
+            overlayPermissionManager.request();
+        afterAllow.onCallEvent();
+      });
+  }
+
+  protected final void showPermissionDialog(final String title, final String description, final Event event) {
+    new MaterialAlertDialogBuilder(this)
+        .setTitle(title)
+        .setMessage(description)
+        .setPositiveButton(
+            StringUtil.getString(R.string.common_word_allow),
+            (d, w) -> {
+              event.onCallEvent();
+            })
+        .setCancelable(false)
+        .show();
   }
 
   @Nullable

@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.ui.activities;
+package dev.trindadedev.eltrinity.ui.activities.runner;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -22,36 +22,32 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.ViewGroup;
-import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import bsh.EvalError;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dev.trindadedev.eltrinity.databinding.ActivityRunnerBinding;
-import dev.trindadedev.eltrinity.project.api.BaseAPIActivity;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
-import java.io.File;
+import dev.trindadedev.eltrinity.project.api.BaseAPIActivity;
+import java.io.IOException;
 
 public class RunnerActivity extends BaseAPIActivity {
 
-  @NonNull
-  private ActivityRunnerBinding binding;
+  @NonNull private ActivityRunnerBinding binding;
 
-  @NonNull
-  private ELTrinityInterpreter interpreter;
+  @NonNull private ELTrinityInterpreter interpreter;
+
+  @Nullable private RunnerState runnerState;
 
   @Override
   @NonNull
-  protected ELTrinityInterpreter getInterpreter() {
+  protected ELTrinityInterpreter getInterpreter() throws EvalError {
     if (interpreter == null) {
-      try {
-        interpreter = new ELTrinityInterpreter(this);
-      } catch (EvalError exc) {
-        showErrorDialog(exc.toString());
-      }
+      interpreter = new ELTrinityInterpreter(this);
     }
     return interpreter;
   }
@@ -73,22 +69,46 @@ public class RunnerActivity extends BaseAPIActivity {
   @Override
   protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
     super.onBindLayout(savedInstanceState);
-    try {
-      final String projectName = getIntent().getStringExtra("project_name");
-      final File projectPath = new File(ELTrinityInterpreter.PROJECTS_PATH, projectName);
+    configureData(savedInstanceState);
+  }
 
+  @Override
+  protected void onPostBind(@Nullable final Bundle savedInstanceState) {
+    super.onPostBind(savedInstanceState);
+    try {
       final ELTrinityInterpreter.InterpreterEvents interpreterEvents =
           new ELTrinityInterpreter.InterpreterEvents();
 
       interpreterEvents.setOnLogAdded(this::updateLogsUI);
 
-      interpreter.setProjectPath(projectPath);
-      interpreter.setEvents(interpreterEvents);
-      interpreter.runProjectMain();
+      runnerState.project.print();
+      interpreter = new ELTrinityInterpreter(this, runnerState.project, interpreterEvents);
+
+      interpreter.runProject();
+
       interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
 
-    } catch (final EvalError e) {
-      showErrorDialog("Error: " + e.getMessage());
+    } catch (EvalError | IOException e) {
+      showErrorDialog(e.toString());
+    }
+  }
+
+  @Override
+  public void onSaveInstanceState(final Bundle bundle) {
+    bundle.putParcelable("runner_state", runnerState);
+  }
+
+  @Override
+  protected void onBSHError(EvalError e) {
+    showErrorDialog(e.toString());
+  }
+
+  /** Get and define all needed variables */
+  private final void configureData(@Nullable final Bundle savedInstanceState) {
+    if (savedInstanceState == null) {
+      runnerState = getParcelable("runner_state", RunnerState.class);
+    } else {
+      runnerState = getParcelable(savedInstanceState, "runner_state", RunnerState.class);
     }
   }
 
@@ -128,7 +148,11 @@ public class RunnerActivity extends BaseAPIActivity {
               clipboard.setPrimaryClip(clip);
               Toast.makeText(this, "Copied!", Toast.LENGTH_SHORT).show();
             })
-        .setNegativeButton("Close", null)
+        .setNegativeButton(
+            "Close",
+            (dialog, which) -> {
+              finish();
+            })
         .show();
   }
 }

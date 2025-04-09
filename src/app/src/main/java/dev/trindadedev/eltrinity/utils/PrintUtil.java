@@ -16,15 +16,22 @@ package dev.trindadedev.eltrinity.utils;
  * limitations under the License.
  */
 
+import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PrintUtil {
 
+  private static final String TAG = "ELTrinity";
+
   private static final List<String> allLogs = new ArrayList<>();
 
   public static void print(final Object toPrint) {
-    allLogs.add(String.valueOf(toPrint));
-    System.out.print(toPrint);
+    print(TAG, toPrint);
+  }
+
+  public static void print(final String tag, final Object toPrint) {
+    allLogs.add(toPrint.toString());
+    Log.d(tag, toPrint.toString());
   }
 }

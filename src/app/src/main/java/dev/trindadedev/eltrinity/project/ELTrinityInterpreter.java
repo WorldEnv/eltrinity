@@ -19,15 +19,17 @@ package dev.trindadedev.eltrinity.project;
 import android.content.Context;
 import bsh.EvalError;
 import bsh.Interpreter;
-import dev.trindadedev.eltrinity.utils.FileUtil;
+import dev.trindadedev.eltrinity.beans.ProjectBean;
+import dev.trindadedev.eltrinity.c2bsh.C2BSH;
 import dev.trindadedev.eltrinity.project.api.API;
+import dev.trindadedev.eltrinity.project.manage.ProjectManager;
+import dev.trindadedev.eltrinity.utils.FileUtil;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ELTrinityInterpreter extends Interpreter {
-
-  public static final String PROJECTS_PATH = "/sdcard/bsh";
 
   private static final String LOG_TASK = "[TASK]";
   private static final String LOG_SUCCESS = "[SUCCESS]";
@@ -35,90 +37,89 @@ public class ELTrinityInterpreter extends Interpreter {
   private static final String LOG_ERROR = "[ERROR]";
   private static final String LOG_INFO = "[INFO]";
 
-  public InterpreterEvents events;
-
   protected Context context;
+
+  protected ProjectBean project;
   protected File projectPath;
+
   protected List<String> logs;
   protected API api;
+  protected InterpreterEvents events;
 
   public ELTrinityInterpreter(final Context context) throws EvalError {
+    this(context, new ProjectBean(), new InterpreterEvents());
+  }
+
+  public ELTrinityInterpreter(final Context context, final ProjectBean project) throws EvalError {
+    this(context, project, new InterpreterEvents());
+  }
+
+  public ELTrinityInterpreter(
+      final Context context, final ProjectBean project, final InterpreterEvents events)
+      throws EvalError {
     super();
-    this.context = context;
     this.logs = new ArrayList<>();
-    this.events = new InterpreterEvents();
+    this.context = context;
     this.api = new API(context, this);
+    this.events = events;
+    setProject(project);
+    configureVariables();
+    addTaskLog("Environment variables defined.");
+  }
+
+  public void setProject(final ProjectBean project) throws EvalError {
+    this.project = project;
+
+    if (project == null || project.basicInfo == null || project.basicInfo.name == null) {
+      addErrorLog("Invalid project data: basicInfo or name is null");
+      throw new IllegalStateException("Invalid project: project name is null");
+    }
+
+    projectPath = new File(ProjectManager.getProjectsFile(), project.projectFolderPath);
     configureVariables();
   }
 
-  public ELTrinityInterpreter(final Context context, final File projectPath) throws EvalError {
-    this(context, projectPath, new InterpreterEvents());
-  }
-
-  public ELTrinityInterpreter(final Context context, final File projectPath, InterpreterEvents events)
-      throws EvalError {
-    this(context);
-    setProjectPath(projectPath);
-    setEvents(events);
-  }
-
-  public void setProjectPath(File projectPath) {
-    this.projectPath = projectPath;
-  }
-
-  public void setEvents(InterpreterEvents events) {
+  public void setEvents(final InterpreterEvents events) {
     this.events = events;
   }
 
   private void configureVariables() throws EvalError {
-    set("projectPath", projectPath);
     set("context", context);
+    set("project", project);
+    set("projectPath", projectPath);
     set("api", api);
-    addTaskLog("Environment variables defined.");
   }
 
-  /** Compiles the main file of Project. */
-  public void runProjectMain() throws EvalError {
+  public void runProject() throws EvalError, IOException {
+    if (project == null) {
+      addErrorLog("Project not loaded successfully. Aborting.");
+      return;
+    }
+
     if (projectPath == null) {
-      addErrorLog("Project path is not set!");
+      addErrorLog("Project path is not set. Aborting.");
       return;
     }
 
-    if (!getProjectMainFile().exists()) {
-      addErrorLog("Project main.bsh File Not Exists!\n");
+    if (project.basicInfo.files == null || project.basicInfo.files.isEmpty()) {
+      addErrorLog("No files provided. Aborting.");
       return;
     }
 
-    final String projectMainContent = FileUtil.readFile(getProjectMainFile());
-
-    if (projectMainContent.isEmpty()) {
-      addErrorLog("Empty Project main.bsh File!\n");
-      return;
-    }
-    eval(projectMainContent);
-
-    addSuccessLog("Compiled successfully!");
-
-    if (api.project.getName() == null || api.project.getName().isEmpty()) {
+    if (project.basicInfo.name == null || project.basicInfo.name.isEmpty()) {
       addWarningLog("Please provide Project Name");
     } else {
-      addInfoLog("Running " + api.project.getName() + "...");
+      addInfoLog("Running " + project.basicInfo.name + "...");
     }
 
-    if (api.project.getDescription() == null || api.project.getDescription().isEmpty()) {
+    if (project.basicInfo.description == null || project.basicInfo.description.isEmpty()) {
       addWarningLog("Please provide Project Description");
     } else {
-      addInfoLog("Project Description: " + api.project.getDescription());
+      addInfoLog("Project Description: " + project.basicInfo.description);
     }
 
-    if (api.project.getApiVersion() == null) {
-      addWarningLog("Please declare the API version of your project");
-    } else {
-      addInfoLog("Project API Version: " + api.project.getApiVersion().toString());
-    }
-
-    final String authorName = api.project.getAuthorName();
-    final String authorUserName = api.project.getAuthorUserName();
+    final String authorName = project.basicInfo.authorName;
+    final String authorUserName = project.basicInfo.authorUserName;
 
     if ((authorName == null || authorName.isEmpty())
         && (authorUserName == null || authorUserName.isEmpty())) {
@@ -131,11 +132,67 @@ public class ELTrinityInterpreter extends Interpreter {
               + (authorUserName != null ? authorUserName : "N/A")
               + ")");
     }
+
+    for (final String fileName : project.basicInfo.files) {
+      final File sourceFile = new File(projectPath, fileName);
+      if (sourceFile.exists()) {
+        final String sourceFileName = sourceFile.getName();
+        if (sourceFileName.endsWith(".bsh")) {
+          if (project.basicInfo.files.get(0).equals(sourceFileName)) {
+            evalBSHFile(sourceFile);
+          } else {
+            sourceBSH(sourceFile);
+          }
+        } else if (sourceFileName.endsWith(".c")) {
+          if (project.basicInfo.files.get(0).equals(sourceFileName)) {
+            evalCFile(sourceFile);
+          } else {
+            sourceC(sourceFile);
+          }
+        }
+      } else {
+        addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
+      }
+    }
   }
 
-  /** Returns the main file of Project. */
-  public File getProjectMainFile() {
-    return new File(projectPath, "main.bsh");
+  /** Converts the C lang code to BeanShell Code and compile it. */
+  protected void evalCFile(final File file) throws EvalError {
+    final String cCode = FileUtil.readFile(file);
+    final String bshCode = C2BSH.convert(cCode);
+    final File bshFile = new File(projectPath, "build/" + file.getName() + ".bsh");
+    FileUtil.writeText(bshFile, bshCode);
+    evalBSHFile(bshFile);
+  }
+
+  /** Evaluate an file of Project. */
+  protected void evalBSHFile(final File file) throws EvalError {
+    if (!file.exists()) {
+      addErrorLog(file.getAbsolutePath() + " File Not Exists!\n");
+      return;
+    }
+
+    final String fileContent = FileUtil.readFile(file);
+
+    if (fileContent.isEmpty()) {
+      addErrorLog(file.getName() + " is Empty File!\n");
+      return;
+    }
+
+    eval(fileContent);
+
+    addSuccessLog(file.getName() + " Compiled successfully!");
+  }
+
+  protected void sourceC(final File cFile) throws EvalError, IOException {
+    final String cCode = FileUtil.readFile(cFile);
+    final String bshCode = C2BSH.convert(cCode);
+    final File bshFile = new File(projectPath, "build/" + cFile.getName() + ".bsh");
+    sourceBSH(bshFile);
+  }
+
+  protected void sourceBSH(final File bshFile) throws EvalError, IOException {
+    source(bshFile.getAbsolutePath());
   }
 
   public List<String> getLogs() {
@@ -169,6 +226,10 @@ public class ELTrinityInterpreter extends Interpreter {
 
   public API getAPI() {
     return api;
+  }
+
+  public InterpreterEvents getInterpreterEvents() {
+    return events;
   }
 
   public API.LifecycleEvents getProjectLifecycleEvents() {

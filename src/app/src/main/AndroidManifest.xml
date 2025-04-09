@@ -4,6 +4,8 @@
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
   <application
     android:allowBackup="true"
     android:icon="@mipmap/ic_launcher"
@@ -13,7 +15,7 @@
     android:theme="@style/Theme.ELTrinity"
     android:name="dev.trindadedev.eltrinity.ELTrinity">
     <activity
-      android:name="dev.trindadedev.eltrinity.ui.activities.MainActivity"
+      android:name="dev.trindadedev.eltrinity.ui.activities.main.MainActivity"
       android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -21,7 +23,8 @@
       </intent-filter>
     </activity>
 
-    <activity android:name="dev.trindadedev.eltrinity.ui.activities.RunnerActivity" />
+    <activity android:name="dev.trindadedev.eltrinity.ui.activities.runner.RunnerActivity" />
+    <activity android:name="dev.trindadedev.eltrinity.ui.activities.debug.DebugActivity" />
 
   </application>
 </manifest>
