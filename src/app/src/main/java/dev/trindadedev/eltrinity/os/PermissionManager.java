@@ -90,8 +90,7 @@ public class PermissionManager {
     private final ActivityResultLauncher<Intent> overlayPermissionLauncher;
 
     public Overlay(
-        final Activity activity,
-        final ActivityResultLauncher<Intent> overlayPermissionLauncher) {
+        final Activity activity, final ActivityResultLauncher<Intent> overlayPermissionLauncher) {
       this.activity = activity;
       this.overlayPermissionLauncher = overlayPermissionLauncher;
     }

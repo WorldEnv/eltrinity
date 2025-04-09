@@ -76,8 +76,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     storagePermissionManager =
         new PermissionManager.Storage(
             this, allFilesPermissionLauncher, readWritePermissionLauncher);
-    overlayPermissionManager =
-        new PermissionManager.Overlay(this, overlayPermissionLauncher);
+    overlayPermissionManager = new PermissionManager.Overlay(this, overlayPermissionLauncher);
     progressDialog = new ProgressDialog(this);
     onPostBind(savedInstanceState);
   }

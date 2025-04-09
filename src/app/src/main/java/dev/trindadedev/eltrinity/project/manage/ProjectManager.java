@@ -58,7 +58,8 @@ public class ProjectManager extends Contextualizable {
     final var projectPath = new File(getProjectsFile(), project.basicInfo.name);
     final var projectBasicInfo = project.basicInfo;
     final var projectBasicInfoJson = GsonUtil.getGson().toJson(projectBasicInfo);
-    project.projectFolderPath = projectPath.getAbsolutePath().substring(projectPath.getAbsolutePath().lastIndexOf("/") + 1);
+    project.projectFolderPath =
+        projectPath.getAbsolutePath().substring(projectPath.getAbsolutePath().lastIndexOf("/") + 1);
     FileUtil.makeDir(projectPath);
     FileUtil.writeText(getBasicInfoFile(projectBasicInfo.name), projectBasicInfoJson);
   }
