@@ -139,9 +139,17 @@ public class ELTrinityInterpreter extends Interpreter {
       if (sourceFile.exists()) {
         final String sourceFileName = sourceFile.getName();
         if (sourceFileName.endsWith(".bsh")) {
-          evalBSHFile(sourceFile);
+          if (project.basicInfo.files.get(0).equals(sourceFileName)) {
+            evalBSHFile(sourceFile);
+          } else {
+            sourceBSH(sourceFile);
+          }
         } else if (sourceFileName.endsWith(".c")) {
-          evalCFile(sourceFile);
+          if (project.basicInfo.files.get(0).equals(sourceFileName)) {
+            evalCFile(sourceFile);
+          } else {
+            sourceC(sourceFile);
+          }
         }
       } else {
         addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
@@ -175,6 +183,17 @@ public class ELTrinityInterpreter extends Interpreter {
     eval(fileContent);
 
     addSuccessLog(file.getName() + " Compiled successfully!");
+  }
+
+  protected void sourceC(final file cFile) {
+    final String cCode = FileUtil.readFile(file);
+    final String bshCode = C2BSH.convert(cCode);
+    final File bshFile = new File(projectPath, "build/" + file.getName() + ".bsh");
+    sourceBSH(bshFile);
+  }
+
+  protected void sourceBSH(final File bshFile) {
+    source(bshFile.getAbsolutePath());
   }
 
   public List<String> getLogs() {
