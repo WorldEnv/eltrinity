@@ -46,8 +46,6 @@ public class MainActivity extends BaseAppCompatActivity {
 
   @Override
   protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
-    binding.toolbar.setDisplayHomeAsUpEnabled(true);
-    binding.toolbar.setHomeButtonEnabled(true);
     projectsViewModel = new ViewModelProvider(this).get(ProjectsViewModel.class);
     projectsAdapter = new ProjectsAdapter();
     projectsAdapter.setOnProjectClick(this::openProject);
