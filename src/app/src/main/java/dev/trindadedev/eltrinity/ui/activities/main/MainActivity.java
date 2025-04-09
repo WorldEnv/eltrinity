@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.databinding.ActivityMainBinding;
+import dev.trindadedev.eltrinity.os.PermissionStatus;
 import dev.trindadedev.eltrinity.ui.activities.main.project.ProjectsAdapter;
 import dev.trindadedev.eltrinity.ui.activities.main.project.ProjectsViewModel;
 import dev.trindadedev.eltrinity.ui.activities.runner.RunnerActivity;
@@ -52,6 +53,14 @@ public class MainActivity extends BaseAppCompatActivity {
   @Override
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
     projectsViewModel = new ViewModelProvider(this).get(ProjectsViewModel.class);
+    if (storagePermissionManager.check() == PermissionStatus.GRANTED) {
+      init();
+    } else {
+      showStoragePermissionDialog(() -> init());
+    }
+  }
+
+  void init() {
     projectsAdapter = new ProjectsAdapter();
     projectsAdapter.setOnProjectClick(this::openProject);
     projectsViewModel.fetch();
