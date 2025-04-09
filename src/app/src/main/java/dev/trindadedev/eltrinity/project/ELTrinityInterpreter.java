@@ -16,7 +16,6 @@ package dev.trindadedev.eltrinity.project;
  * limitations under the License.
  */
 
-import Java.io.FileNotFoundException;
 import android.content.Context;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -91,7 +90,7 @@ public class ELTrinityInterpreter extends Interpreter {
     set("api", api);
   }
 
-  public void runProject() throws EvalError, IOException, FileNotFoundException {
+  public void runProject() throws EvalError, IOException {
     if (project == null) {
       addErrorLog("Project not loaded successfully. Aborting.");
       return;
@@ -185,14 +184,14 @@ public class ELTrinityInterpreter extends Interpreter {
     addSuccessLog(file.getName() + " Compiled successfully!");
   }
 
-  protected void sourceC(final File cFile) throws FileNotFoundException {
+  protected void sourceC(final File cFile) throws IOException {
     final String cCode = FileUtil.readFile(cFile);
     final String bshCode = C2BSH.convert(cCode);
     final File bshFile = new File(projectPath, "build/" + cFile.getName() + ".bsh");
     sourceBSH(bshFile);
   }
 
-  protected void sourceBSH(final File bshFile) throws FileNotFoundException {
+  protected void sourceBSH(final File bshFile) throws IOException {
     source(bshFile.getAbsolutePath());
   }
 
