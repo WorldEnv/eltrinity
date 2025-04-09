@@ -29,56 +29,27 @@ import java.util.Map;
 
 public class DebugActivity extends Activity {
 
-    private static final Map<String, String> exceptionMap = new HashMap<String, String>() {{
-        put("StringIndexOutOfBoundsException", "Invalid string operation\n");
-        put("IndexOutOfBoundsException", "Invalid list operation\n");
-        put("ArithmeticException", "Invalid arithmetical operation\n");
-        put("NumberFormatException", "Invalid toNumber block operation\n");
-        put("ActivityNotFoundException", "Invalid intent operation\n");
-    }};
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final SpannableStringBuilder formattedMessage = new SpannableStringBuilder();
         final Intent intent = getIntent();
-        String errorMessage = "";
 
         if (intent != null) {
-          errorMessage = intent.getStringExtra("error");
-        }
+          final String errorMessage = intent.getStringExtra("error");
+          if (errorMessage.isEmpty()) {
+            final TextView errorView = new TextView(this);
+            errorView.setText(errorMessage);
+            errorView.setTextIsSelectable(true);
 
-        if (!errorMessage.isEmpty()) {
-          String[] split = errorMessage.split("\n");
+            final HorizontalScrollView hscroll = new HorizontalScrollView(this);
+            final ScrollView vscroll = new ScrollView(this);
 
-          String exceptionType = split[0];
-          String message = exceptionMap.containsKey(exceptionType) ? exceptionMap.get(exceptionType) : "";
+            hscroll.addView(vscroll);
+            vscroll.addView(errorView);
 
-          if (!message.isEmpty()) {
-            formattedMessage.append(message);
+            setContentView(hscroll);
           }
-
-          for (int i = 1; i < split.length; i++) {
-            formattedMessage.append(split[i]);
-            formattedMessage.append("\n");
-          }
-        } else {
-          formattedMessage.append("No error message available.");
         }
-
-        setTitle(getTitle() + " Crashed");
-
-        final TextView errorView = new TextView(this);
-        errorView.setText(formattedMessage);
-        errorView.setTextIsSelectable(true);
-
-        final HorizontalScrollView hscroll = new HorizontalScrollView(this);
-        final ScrollView vscroll = new ScrollView(this);
-
-        hscroll.addView(vscroll);
-        vscroll.addView(errorView);
-
-        setContentView(hscroll);
     }
 }
