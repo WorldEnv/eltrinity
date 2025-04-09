@@ -89,52 +89,21 @@ public class ELTrinityInterpreter extends Interpreter {
     set("api", api);
   }
 
-  /** Compiles main file of project. */
-  public void runProjectMain() throws EvalError {
-    final File file = getProjectMainFile();
-    final String name = file.getName();
-    if (name.endsWith(".bsh")) {
-      runBSHFile(file);
-    } else if (name.endsWith(".c")) {
-      runCFile(file);
-    }
-  }
-
-  /** Converts the C lang code to BeanShell Code and compile it. */
-  protected void runCFile(final File file) throws EvalError {
-    final String cCode = FileUtil.readFile(file);
-    final String bshCode = C2BSH.convert(cCode);
-    final File bshFile = new File(projectPath, "build/" + file.getName() + ".bsh");
-    FileUtil.writeText(bshFile, bshCode);
-    runBSHFile(bshFile);
-  }
-
-  /** Compiles an file of Project. */
-  protected void runBSHFile(final File file) throws EvalError {
+  public void runProject() throws EvalError {
     if (project == null) {
-      addErrorLog("Project not loaded successfully!");
+      addErrorLog("Project not loaded successfully. Aborting.");
       return;
     }
 
     if (projectPath == null) {
-      addErrorLog("Project path is not set!");
+      addErrorLog("Project path is not set. Aborting.");
       return;
     }
 
-    if (!file.exists()) {
-      addErrorLog(file.getAbsolutePath() + " File Not Exists!\n");
+    if (project.basicInfo.files == null || project.basicInfo.files.isEmpty()) {
+      addErrorLog("No files provided. Aborting.");
       return;
     }
-
-    final String fileContent = FileUtil.readFile(file);
-
-    if (fileContent.isEmpty()) {
-      addErrorLog(file.getName() + " is Empty File!\n");
-      return;
-    }
-    eval(fileContent);
-
-    addSuccessLog("Compiled successfully!");
 
     if (project.basicInfo.name == null || project.basicInfo.name.isEmpty()) {
       addWarningLog("Please provide Project Name");
@@ -162,11 +131,54 @@ public class ELTrinityInterpreter extends Interpreter {
               + (authorUserName != null ? authorUserName : "N/A")
               + ")");
     }
+
+    if (project.basicInfo.files.length > 1) {
+      for (int i = 1; i >= project.basicInfo.files.length; i++) {
+        final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
+        if (sourceFile.exists()) {
+          source(sourceFile);
+        } else {
+          addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
+        }
+      }
+    }
+
+    // evaluate main
+    final File mainFile = new File(projectPath, project.basicInfo.files.get(0));
+    final String mainFileName = mainFile.getName();
+    if (mainFileName.endsWith(".bsh")) {
+      evalBSHFile(mainFile);
+    } else if (name.endsWith(".c")) {
+      evalCFile(mainFile);
+    }
   }
 
-  /** Returns the main file of Project. */
-  public File getProjectMainFile() {
-    return new File(projectPath, "main.bsh");
+  /** Converts the C lang code to BeanShell Code and compile it. */
+  protected void evalCFile(final File file) throws EvalError {
+    final String cCode = FileUtil.readFile(file);
+    final String bshCode = C2BSH.convert(cCode);
+    final File bshFile = new File(projectPath, "build/" + file.getName() + ".bsh");
+    FileUtil.writeText(bshFile, bshCode);
+    evalBSHFile(bshFile);
+  }
+
+  /** Evaluate an file of Project. */
+  protected void evalBSHFile(final File file) throws EvalError {
+    if (!file.exists()) {
+      addErrorLog(file.getAbsolutePath() + " File Not Exists!\n");
+      return;
+    }
+
+    final String fileContent = FileUtil.readFile(file);
+
+    if (fileContent.isEmpty()) {
+      addErrorLog(file.getName() + " is Empty File!\n");
+      return;
+    }
+
+    eval(fileContent);
+
+    addSuccessLog("Compiled successfully!");
   }
 
   public List<String> getLogs() {

@@ -22,7 +22,7 @@ public class ProjectsAdapter extends ListAdapter<File, ProjectsAdapter.ProjectsA
   @Override
   public ProjectsAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int parentType) {
     return new ProjectsAdapterViewHolder(
-        LayoutProjectBinding.inflate(LayoutInflater.from(parent.getContext())));
+        LayoutProjectBinding.inflate(LayoutInflater.from(parent.getContext(), parent, false)));
   }
 
   @Override
