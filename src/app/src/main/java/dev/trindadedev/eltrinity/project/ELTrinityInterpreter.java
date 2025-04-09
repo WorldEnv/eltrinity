@@ -25,6 +25,7 @@ import dev.trindadedev.eltrinity.project.api.API;
 import dev.trindadedev.eltrinity.project.manage.ProjectManager;
 import dev.trindadedev.eltrinity.utils.FileUtil;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class ELTrinityInterpreter extends Interpreter {
     set("api", api);
   }
 
-  public void runProject() throws EvalError {
+  public void runProject() throws EvalError, IOException {
     if (project == null) {
       addErrorLog("Project not loaded successfully. Aborting.");
       return;
@@ -132,7 +133,7 @@ public class ELTrinityInterpreter extends Interpreter {
               + ")");
     }
 
-    if (project.basicInfo.files.length > 1) {
+    if (project.basicInfo.files.size() > 1) {
       for (int i = 1; i >= project.basicInfo.files.length; i++) {
         final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
         if (sourceFile.exists()) {
@@ -148,7 +149,7 @@ public class ELTrinityInterpreter extends Interpreter {
     final String mainFileName = mainFile.getName();
     if (mainFileName.endsWith(".bsh")) {
       evalBSHFile(mainFile);
-    } else if (name.endsWith(".c")) {
+    } else if (mainFileName.endsWith(".c")) {
       evalCFile(mainFile);
     }
   }
