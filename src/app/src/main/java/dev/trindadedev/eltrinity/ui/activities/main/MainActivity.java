@@ -47,7 +47,7 @@ public class MainActivity extends BaseAppCompatActivity {
 
   @Override
   protected void onBindLayout(@Nullable final Bundle savedInstanceState) {
-    super.onBindLayout(savedInstanceState);
+    // hell nah
   }
 
   @Override
