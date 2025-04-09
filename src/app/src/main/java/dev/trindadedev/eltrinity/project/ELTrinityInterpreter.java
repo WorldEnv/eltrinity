@@ -134,8 +134,8 @@ public class ELTrinityInterpreter extends Interpreter {
               + ")");
     }
 
-    for (int i = project.basicInfo.files.size(); i == 0; i--) {
-      final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
+    project.basicInfo.files.forEach(fileName -> {
+      final File sourceFile = new File(projectPath, fileName);
       if (sourceFile.exists()) {
         final String sourceFileName = sourceFile.getName();
         if (sourceFileName.endsWith(".bsh")) {
@@ -146,7 +146,7 @@ public class ELTrinityInterpreter extends Interpreter {
       } else {
         addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
       }
-    }
+    });
   }
 
   /** Converts the C lang code to BeanShell Code and compile it. */
