@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">El Trinity</string>
+  <string name="app_name">EL Trinity</string>
 
   <string name="common_word_loading">Loading</string>
+  <string name="common_word_allow">Allow</string>
 
   <string name="text_runner">Runner</string>
+
+  <string name="permission_storage_title">Storage permission</string>
+  <string name="permission_storage_description">EL Trinity needs storage acess to load projects</string>
+
+  <string name="permission_overlay_title">Draw overlays permission</string>
+  <string name="permission_overlay_description">EL Trinity nerds draw overlay permission to windows api</string>
 </resources>

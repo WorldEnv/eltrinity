@@ -28,12 +28,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import dev.trindadedev.eltrinity.R;
 import dev.trindadedev.eltrinity.os.PermissionManager;
 import dev.trindadedev.eltrinity.os.PermissionStatus;
 import dev.trindadedev.eltrinity.os.PermissionType;
 import dev.trindadedev.eltrinity.ui.components.dialog.ProgressDialog;
 import dev.trindadedev.eltrinity.utils.EdgeToEdge;
 import dev.trindadedev.eltrinity.utils.PrintUtil;
+import dev.trindadedev.eltrinity.utils.StringUtil;
+import dev.trindadedev.eltrinity.project.Event;
 import java.io.Serializable;
 
 @SuppressWarnings("DEPRECATION")
@@ -88,9 +92,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
     if (storagePermissionManager.check() == PermissionStatus.DENIED)
-      storagePermissionManager.request();
-    if (overlayPermissionManager.check() == PermissionStatus.DENIED)
-      overlayPermissionManager.request();
+      showStoragePermissionDialog(() -> showOverlayPermissionDialog(() -> {}));
     EdgeToEdge.enable(this);
   }
 
@@ -139,6 +141,47 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
   protected final void openActivity(final Class<? extends BaseAppCompatActivity> activity) {
     startActivity(new Intent(this, activity));
+  }
+
+  protected final void showStoragePermission(final Event afterAllow) {
+    if (storagePermissionManager.check() == PermissionStatus.GRANTED) {
+      afterAllow.onCallEvent();
+      return;
+    }
+    showPermissionDialog(StringUtil.getString(R.string.permission_storage_title),
+      StringUtil.getString(R.string.permission_storage_description),
+      () -> {
+        if (storagePermissionManager.check() == PermissionStatus.DENIED)
+            overlayPermissionManager.request();
+        afterAllow.onCallEvent();
+      });
+  }
+
+  protected final void showOverlayPermission(final Event afterAllow) {
+    if (overlayPermissionManager.check() == PermissionStatus.GRANTED) {
+      afterAllow.onCallEvent();
+      return;
+    }
+    showPermissionDialog(StringUtil.getString(R.string.permission_overlay_title),
+      StringUtil.getString(R.string.permission_overlay_description),
+      () -> {
+        if (overlayPermissionManager.check() == PermissionStatus.DENIED)
+            overlayPermissionManager.request();
+        afterAllow.onCallEvent();
+      });
+  }
+
+  protected final void showPermissionDialog(final String title, final String description, final Event event) {
+    new MaterialAlertDialogBuilder(this)
+        .setTitle(title)
+        .setMessage(description)
+        .setPositiveButton(
+            StringUtil.getString(R.string.common_word_allow),
+            (d, w) -> {
+              event.onCallEvent();
+            })
+        .setCancelable(false)
+        .show();
   }
 
   @Nullable
