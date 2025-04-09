@@ -83,15 +83,14 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
             this, allFilesPermissionLauncher, readWritePermissionLauncher);
     overlayPermissionManager = new PermissionManager.Overlay(this, overlayPermissionLauncher);
     progressDialog = new ProgressDialog(this);
-    if (storagePermissionManager.check() == PermissionStatus.DENIED) {
-      showStoragePermissionDialog(() -> {
-        showOverlayPermissionDialog(() -> {
-          // when add more permissions
-          // call onPostBind after the last permission allow
-          onPostBind(savedInstanceState);
-        });
+    
+    showStoragePermissionDialog(() -> {
+      showOverlayPermissionDialog(() -> {
+        // when add more permissions
+        // call onPostBind after the last permission allow
+        onPostBind(savedInstanceState);
       });
-    }
+    });
   }
 
   // should return the root view of screen layout
