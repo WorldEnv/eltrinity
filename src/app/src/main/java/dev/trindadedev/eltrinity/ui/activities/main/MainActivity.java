@@ -52,15 +52,8 @@ public class MainActivity extends BaseAppCompatActivity {
 
   @Override
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
+    super.onPostBind(savedInstanceState);
     projectsViewModel = new ViewModelProvider(this).get(ProjectsViewModel.class);
-    if (storagePermissionManager.check() == PermissionStatus.GRANTED) {
-      init();
-    } else {
-      showStoragePermissionDialog(() -> init());
-    }
-  }
-
-  void init() {
     projectsAdapter = new ProjectsAdapter();
     projectsAdapter.setOnProjectClick(this::openProject);
     projectsViewModel.fetch();
