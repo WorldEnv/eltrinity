@@ -77,23 +77,35 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     rootView = bindLayout();
     setContentView(rootView);
     onBindLayout(savedInstanceState);
+    EdgeToEdge.enable(this);
     storagePermissionManager =
         new PermissionManager.Storage(
             this, allFilesPermissionLauncher, readWritePermissionLauncher);
     overlayPermissionManager = new PermissionManager.Overlay(this, overlayPermissionLauncher);
     progressDialog = new ProgressDialog(this);
+    if (storagePermissionManager.check() == PermissionStatus.DENIED) {
+      showStoragePermissionDialog(() -> {
+        showOverlayPermissionDialog(() -> {
+          // when add more permissions
+          // call onPostBind after the last permission allow
+          
+        });
+      });
+    }
     onPostBind(savedInstanceState);
   }
 
+  // should return the root view of screen layout
   @NonNull
   protected abstract View bindLayout();
 
+  // called just after bind the layout with the setContentView
   protected abstract void onBindLayout(@Nullable final Bundle savedInstanceState);
 
+  // this method is more recommended than onBindLayout
+  // its called before all checks, so its better
+  // use onBindLayout just if u need to do something before permission checks.
   protected void onPostBind(@Nullable final Bundle savedInstanceState) {
-    if (storagePermissionManager.check() == PermissionStatus.DENIED)
-      showStoragePermissionDialog(() -> showOverlayPermissionDialog(() -> {}));
-    EdgeToEdge.enable(this);
   }
 
   protected void showProgress() {
