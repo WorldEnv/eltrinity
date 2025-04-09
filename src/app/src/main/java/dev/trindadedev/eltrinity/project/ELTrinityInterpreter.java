@@ -191,7 +191,7 @@ public class ELTrinityInterpreter extends Interpreter {
     sourceBSH(bshFile);
   }
 
-  protected void sourceBSH(final File bshFile) throws IOException {
+  protected void sourceBSH(final File bshFile) throws EvalError, IOException {
     source(bshFile.getAbsolutePath());
   }
 
