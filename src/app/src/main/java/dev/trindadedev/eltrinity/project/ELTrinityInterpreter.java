@@ -24,6 +24,7 @@ import dev.trindadedev.eltrinity.c2bsh.C2BSH;
 import dev.trindadedev.eltrinity.project.api.API;
 import dev.trindadedev.eltrinity.project.manage.ProjectManager;
 import dev.trindadedev.eltrinity.utils.FileUtil;
+import dev.trindadedev.eltrinity.utils.PrintUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -136,6 +137,7 @@ public class ELTrinityInterpreter extends Interpreter {
     if (project.basicInfo.files.size() > 1) {
       for (int i = 1; i >= project.basicInfo.files.size(); i++) {
         final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
+        PrintUtil.print(sourceFile);
         if (sourceFile.exists()) {
           final String sourceCode = FileUtil.readFile(sourceFile);
           if (sourceCode.isEmpty()) {
