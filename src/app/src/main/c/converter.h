@@ -14,6 +14,8 @@ typedef struct {
 
 // the main method to convert.
 // @param c_code the c code to convert into beanshell.
-c2bsh_result c2bsh_convert(const char* c_code);
+c2bsh_result c2bsh_convert(char* c_code);
+
+void c2bsh_close(c2bsh_result result);
 
 #endif

@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  const char* c_code = file_read_text(file_path);
+  char* c_code = file_read_text(file_path);
 
   printf("Provided file: %s\n\n", file_path);
   printf("C code: \n\n%s\n", c_code);
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     printf("%s\n", convert_result.includes[i]);
   }
 
-  free(convert_result.includes);
+  c2bsh_close(convert_result);
   free(c_code);
   return 0;
 }

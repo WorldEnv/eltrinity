@@ -10,7 +10,7 @@
 #include "converter.h"
 #include "str_util.h"
 
-c2bsh_result c2bsh_convert(const char* c_code) {
+c2bsh_result c2bsh_convert(char* c_code) {
   char* line = strtok(c_code, "\n");
   char** includes;
   while (line != NULL) {
@@ -23,4 +23,8 @@ c2bsh_result c2bsh_convert(const char* c_code) {
   result.code = "";
   result.includes = includes;
   return result;
+}
+
+void c2bsh_close(c2bsh_result result) {
+  free(result.includes);
 }
