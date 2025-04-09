@@ -32,7 +32,7 @@ public final class ELTrinity extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-    appContext = this;
+    mAppContext = this;
     Thread.setDefaultUncaughtExceptionHandler(
         new Thread.UncaughtExceptionHandler() {
             @Override
