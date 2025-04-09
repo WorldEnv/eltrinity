@@ -33,6 +33,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import dev.trindadedev.eltrinity.databinding.ActivityRunnerBinding;
 import dev.trindadedev.eltrinity.project.ELTrinityInterpreter;
 import dev.trindadedev.eltrinity.project.api.BaseAPIActivity;
+import java.io.FileNotFoundException; 
 import java.io.IOException;
 
 public class RunnerActivity extends BaseAPIActivity {
@@ -88,7 +89,7 @@ public class RunnerActivity extends BaseAPIActivity {
 
       interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
 
-    } catch (EvalError | IOException e) {
+    } catch (EvalError | IOException | FileNotFoundException e) {
       showErrorDialog(e.toString());
     }
   }

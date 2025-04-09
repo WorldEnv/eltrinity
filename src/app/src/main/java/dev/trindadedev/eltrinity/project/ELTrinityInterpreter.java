@@ -26,6 +26,7 @@ import dev.trindadedev.eltrinity.project.manage.ProjectManager;
 import dev.trindadedev.eltrinity.utils.FileUtil;
 import dev.trindadedev.eltrinity.utils.PrintUtil;
 import java.io.File;
+import Java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +92,7 @@ public class ELTrinityInterpreter extends Interpreter {
     set("api", api);
   }
 
-  public void runProject() throws EvalError, IOException {
+  public void runProject() throws EvalError, IOException, FileNotFoundException {
     if (project == null) {
       addErrorLog("Project not loaded successfully. Aborting.");
       return;
@@ -185,14 +186,14 @@ public class ELTrinityInterpreter extends Interpreter {
     addSuccessLog(file.getName() + " Compiled successfully!");
   }
 
-  protected void sourceC(final File cFile) {
+  protected void sourceC(final File cFile) throws FileNotFoundException {
     final String cCode = FileUtil.readFile(cFile);
     final String bshCode = C2BSH.convert(cCode);
     final File bshFile = new File(projectPath, "build/" + cFile.getName() + ".bsh");
     sourceBSH(bshFile);
   }
 
-  protected void sourceBSH(final File bshFile) {
+  protected void sourceBSH(final File bshFile) throws FileNotFoundException {
     source(bshFile.getAbsolutePath());
   }
 
