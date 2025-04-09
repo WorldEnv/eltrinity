@@ -88,11 +88,10 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         showOverlayPermissionDialog(() -> {
           // when add more permissions
           // call onPostBind after the last permission allow
-          
+          onPostBind(savedInstanceState);
         });
       });
     }
-    onPostBind(savedInstanceState);
   }
 
   // should return the root view of screen layout
