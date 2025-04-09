@@ -18,17 +18,33 @@ package dev.trindadedev.eltrinity;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
+import android.os.Process;
+import android.util.Log;
+import dev.trindadedev.eltrinity.ui.activities.debug.DebugActivity;
 import java.io.File;
 
 public final class ELTrinity extends Application {
 
-  private static Context appContext;
+  private static Context mAppContext;
 
   @Override
   public void onCreate() {
     super.onCreate();
     appContext = this;
+    Thread.setDefaultUncaughtExceptionHandler(
+        new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable throwable) {
+              final Intent intent = new Intent(getApplicationContext(), DebugActivity.class);
+              intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+              intent.putExtra("error", Log.getStackTraceString(throwable));
+              startActivity(intent);
+              Process.killProcess(Process.myPid());
+              System.exit(1);
+            }
+        });
   }
 
   public static final String getPublicFolderPath() {
@@ -40,6 +56,6 @@ public final class ELTrinity extends Application {
   }
 
   public static final Context getAppContext() {
-    return appContext;
+    return mAppContext;
   }
 }

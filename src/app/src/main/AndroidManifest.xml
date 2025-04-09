@@ -24,6 +24,7 @@
     </activity>
 
     <activity android:name="dev.trindadedev.eltrinity.ui.activities.runner.RunnerActivity" />
+    <activity android:name="dev.trindadedev.eltrinity.ui.activities.debug.DebugActivity" />
 
   </application>
 </manifest>
