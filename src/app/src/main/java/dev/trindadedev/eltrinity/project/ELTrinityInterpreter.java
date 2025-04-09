@@ -134,7 +134,7 @@ public class ELTrinityInterpreter extends Interpreter {
               + ")");
     }
 
-    project.basicInfo.files.forEach(fileName -> {
+    for (final String fileName : project.basicInfo.files)
       final File sourceFile = new File(projectPath, fileName);
       if (sourceFile.exists()) {
         final String sourceFileName = sourceFile.getName();
@@ -146,7 +146,7 @@ public class ELTrinityInterpreter extends Interpreter {
       } else {
         addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
       }
-    });
+    }
   }
 
   /** Converts the C lang code to BeanShell Code and compile it. */
