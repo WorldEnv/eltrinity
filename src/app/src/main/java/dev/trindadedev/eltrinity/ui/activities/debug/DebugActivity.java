@@ -37,7 +37,7 @@ public class DebugActivity extends Activity {
 
         if (intent != null) {
           final String errorMessage = intent.getStringExtra("error");
-          if (errorMessage.isEmpty()) {
+          if (!errorMessage.isEmpty()) {
             final TextView errorView = new TextView(this);
             errorView.setText(errorMessage);
             errorView.setTextIsSelectable(true);
