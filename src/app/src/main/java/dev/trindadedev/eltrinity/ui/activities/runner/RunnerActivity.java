@@ -89,6 +89,7 @@ public class RunnerActivity extends BaseAPIActivity {
       interpreter = new ELTrinityInterpreter(this, runnerState.project, interpreterEvents);
 
       interpreter.runProject();
+
       interpreter.getProjectLifecycleEvents().onCreate.onCallEvent();
 
     } catch (EvalError | IOException e) {

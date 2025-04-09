@@ -134,30 +134,22 @@ public class ELTrinityInterpreter extends Interpreter {
               + ")");
     }
 
-    if (project.basicInfo.files.size() > 1) {
-      for (int i = 1; i >= project.basicInfo.files.size(); i++) {
-        final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
-        PrintUtil.print(sourceFile);
-        if (sourceFile.exists()) {
-          final String sourceCode = FileUtil.readFile(sourceFile);
-          if (sourceCode.isEmpty()) {
-            addErrorLog(sourceFile.getAbsolutePath() + " Is Empty!");
-            return;
-          }
-          eval(sourceCode);
-        } else {
-          addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
+    for (int i = project.basicInfo.files.size(); i == 0; i--) {
+      final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
+      if (sourceFile.exists()) {
+        final String sourceCode = FileUtil.readFile(sourceFile);
+        if (sourceCode.isEmpty()) {
+          addErrorLog(sourceFile.getAbsolutePath() + " Is Empty!");
+          return;
         }
+        if (sourceFileName.endsWith(".bsh")) {
+          evalBSHFile(sourceFile);
+        } else {
+          evalBSHCode();
+        }
+      } else {
+        addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
       }
-    }
-
-    // evaluate main
-    final File mainFile = new File(projectPath, project.basicInfo.files.get(0));
-    final String mainFileName = mainFile.getName();
-    if (mainFileName.endsWith(".bsh")) {
-      evalBSHFile(mainFile);
-    } else if (mainFileName.endsWith(".c")) {
-      evalCFile(mainFile);
     }
   }
 
@@ -186,7 +178,7 @@ public class ELTrinityInterpreter extends Interpreter {
 
     eval(fileContent);
 
-    addSuccessLog("Compiled successfully!");
+    addSuccessLog(file.getName() + " Compiled successfully!");
   }
 
   public List<String> getLogs() {
