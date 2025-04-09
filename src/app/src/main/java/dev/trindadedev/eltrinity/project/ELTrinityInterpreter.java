@@ -184,7 +184,7 @@ public class ELTrinityInterpreter extends Interpreter {
     addSuccessLog(file.getName() + " Compiled successfully!");
   }
 
-  protected void sourceC(final File cFile) throws IOException {
+  protected void sourceC(final File cFile) throws EvalError, IOException {
     final String cCode = FileUtil.readFile(cFile);
     final String bshCode = C2BSH.convert(cCode);
     final File bshFile = new File(projectPath, "build/" + cFile.getName() + ".bsh");
