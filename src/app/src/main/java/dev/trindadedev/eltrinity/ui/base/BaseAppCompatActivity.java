@@ -162,7 +162,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
       StringUtil.getString(R.string.permission_storage_description),
       () -> {
         if (storagePermissionManager.check() == PermissionStatus.DENIED)
-            overlayPermissionManager.request();
+            storagePermissionManager.request();
         afterAllow.onCallEvent();
       });
   }
