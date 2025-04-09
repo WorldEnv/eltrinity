@@ -185,10 +185,10 @@ public class ELTrinityInterpreter extends Interpreter {
     addSuccessLog(file.getName() + " Compiled successfully!");
   }
 
-  protected void sourceC(final file cFile) {
-    final String cCode = FileUtil.readFile(file);
+  protected void sourceC(final File cFile) {
+    final String cCode = FileUtil.readFile(cFile);
     final String bshCode = C2BSH.convert(cCode);
-    final File bshFile = new File(projectPath, "build/" + file.getName() + ".bsh");
+    final File bshFile = new File(projectPath, "build/" + cFile.getName() + ".bsh");
     sourceBSH(bshFile);
   }
 
