@@ -134,10 +134,10 @@ public class ELTrinityInterpreter extends Interpreter {
     }
 
     if (project.basicInfo.files.size() > 1) {
-      for (int i = 1; i >= project.basicInfo.files.length; i++) {
+      for (int i = 1; i >= project.basicInfo.files.size(); i++) {
         final File sourceFile = new File(projectPath, project.basicInfo.files.get(i));
         if (sourceFile.exists()) {
-          source(sourceFile);
+          Object result = source(sourceFile);
         } else {
           addErrorLog(sourceFile.getAbsolutePath() + " Not Exists!");
         }
