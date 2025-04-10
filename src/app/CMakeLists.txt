@@ -12,7 +12,7 @@ project(${PROJECT_NAME})
 
 # disable this if you're building just the source
 # and want the exe instead libc2bsh.so.
-set(PROJECT_ANDROID_BUILD false)
+set(PROJECT_ANDROID_BUILD true)
 
 configure_file(${PROJECT_C_FILES}/config.h.in ../${PROJECT_C_FILES}/config.h.in)
 
