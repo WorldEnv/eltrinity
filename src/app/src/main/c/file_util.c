@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "file_util.h"
+#include "log.h"
 
 char* file_read_text(char* file_path) {
   long file_length;
@@ -16,7 +17,7 @@ char* file_read_text(char* file_path) {
   FILE* file;
   file = fopen(file_path, "r");
   if (file == NULL) {
-    printf("Can't read file\n");
+    log_debug("Can't read file\n");
     return NULL;
   }
 
@@ -26,7 +27,7 @@ char* file_read_text(char* file_path) {
 
   buffer = malloc(file_length + 1);   // allocate memory for file text
   if (buffer == NULL) {
-    printf("Failed to allocate memory");
+    log_debug("Failed to allocate memory");
     return NULL;
   }
 
