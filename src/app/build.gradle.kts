@@ -66,7 +66,7 @@ android {
 dependencies {
   implementation(files("libs/beanshell.jar"))
   implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-  implementation("com.google.android.material:material:1.13.0-alpha11")
+  implementation("com.google.android.material:material:1.13.0-alpha12")
   implementation("androidx.appcompat:appcompat:1.7.0")
   implementation("com.google.code.gson:gson:2.12.1")
 }
