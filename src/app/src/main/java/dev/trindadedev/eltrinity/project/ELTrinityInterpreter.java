@@ -188,8 +188,10 @@ public class ELTrinityInterpreter extends Interpreter {
 
   protected void sourceC(final File cFile) throws EvalError, IOException {
     final String cCode = FileUtil.readFile(cFile);
-    final String bshCode = C2BSH.convert(cCode);
+    final long c2bshResult = C2BSH.convert(cCode);
+    final String bshCode = C2BSH.getCode(c2bshResult);
     final File bshFile = new File(projectPath, "build/" + cFile.getName() + ".bsh");
+    FileUtil.writeText(bshFile, bshCode);
     sourceBSH(bshFile);
   }
 
