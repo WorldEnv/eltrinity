@@ -23,7 +23,9 @@ public class C2BSH {
 
   public static native long convert(final String cCode);
 
-  public static native String getCode(final long bshCode);
+  public static native String getCode(final long c2bshResult);
+
+  public static native String[] getIncludes(final long c2bshResult);
 
   public static native void close(final long c2bshResult);
 }

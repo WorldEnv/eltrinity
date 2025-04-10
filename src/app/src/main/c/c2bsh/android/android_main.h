@@ -9,13 +9,20 @@
 
 #include <jni.h>
 
-JNIEXPORT jlong JNICALL Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_convert
+JNIEXPORT jlong JNICALL
+Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_convert
   (JNIEnv* env, jobject, jstring j_c_code);
 
-JNIEXPORT jstring JNICALL Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_getCode
+JNIEXPORT jstring JNICALL
+Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_getCode
   (JNIEnv* env, jobject, jlong result);
 
-JNIEXPORT void JNICALL Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_close
+JNIEXPORT jobjectArray JNICALL
+Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_getIncludes
+  (JNIEnv* env, jobject, jlong result);
+
+JNIEXPORT void JNICALL
+Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_close
   (JNIEnv* env, jobject, jlong result);
 
 #endif
