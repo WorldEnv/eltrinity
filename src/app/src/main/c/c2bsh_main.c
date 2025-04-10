@@ -20,12 +20,13 @@ int main(int argc, char** argv) {
   printf("Provided file: %s\n\n", file_path);
   printf("C code: \n\n%s\n", c_code);
 
-  c2bsh_result convert_result = c2bsh_convert(c_code);
+  c2bsh_result* convert_result = c2bsh_convert(c_code);
 
-  printf("BeanShell Code: \n\n%s\n", convert_result.code);
-  printf("C Includes: \n\n");
-  for (int i = 0; convert_result.includes[i] != NULL; i++) {
-    printf("%s\n", convert_result.includes[i]);
+  printf("BeanShell Code: \n\n%s\n", convert_result->code);
+  printf("Includes Count: \n%i\nThe Includes:\n\n", convert_result->includes_count);
+  for (int i = 0; convert_result->includes_count > i; i++) {
+    char* include = convert_result->includes[i];
+    printf("%s\n", include);
   }
 
   c2bsh_close(convert_result);
