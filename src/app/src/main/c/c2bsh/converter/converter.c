@@ -4,18 +4,19 @@
  * in 2025-04-08
  */
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "converter.h"
-#include "str_util.h"
+#include "../string/str_util.h"
 
 // Converts the C lang code to Bean shell code
 // @param c_code The CLang Code.
 // @returns the result
-// @see c2bsh_result struct in converter.h
-c2bsh_result* c2bsh_convert(char* c_code) {
-  c2bsh_result* result = malloc(sizeof(c2bsh_result));
+// @see c2bsh_converter_result struct in converter.h
+c2bsh_converter_result* c2bsh_converter_convert(char* c_code) {
+  c2bsh_converter_result* result = malloc(sizeof(c2bsh_converter_result));
   result->code = calloc(1, 1024 * 10);            // 10KB Buffer.
   result->includes = malloc(sizeof(char*) * 10);  // Max 100 includes.
   result->includes_count = 0;
@@ -25,12 +26,8 @@ c2bsh_result* c2bsh_convert(char* c_code) {
 
   while (line != NULL) {
     // add includes in includes list for futures handles
-    if (str_starts_with(line, "#include")) {
-      char* include_str = line + 8;
-      while (*include_str == ' ') {
-        include_str++;
-      }
-      result->includes[result->includes_count++] = include_str;
+    if (c2bsh_converter_check_include(result, line)) {
+      c2bsh_converter_add_includes(result, line);
       line = strtok(NULL, "\n");
       continue;
     }
@@ -41,11 +38,9 @@ c2bsh_result* c2bsh_convert(char* c_code) {
     // replace c types with bsh/java types
     char* ptr;
     if ((ptr = strstr(buffer, "char*")) != NULL) {
-      memmove(ptr + 6, ptr + 5, strlen(ptr + 5) + 1);
-      memcpy(ptr, "String", 6);
+      str_replace(ptr, "char*", "String");
     } else if ((ptr = strstr(buffer, "bool")) != NULL) {
-      memmove(ptr + 7, ptr + 4, strlen(ptr + 4) + 3);
-      memcpy(ptr, "boolean", 7);
+      str_replace(ptr, "bool", "boolean");
     }
 
     // remove asterisks
@@ -71,7 +66,19 @@ c2bsh_result* c2bsh_convert(char* c_code) {
   return result;
 }
 
+void c2bsh_converter_add_includes(c2bsh_converter_result* result, char* line) {
+  char* include_str = line + 8;
+  while (*include_str == ' ') {
+    include_str++;
+  }
+  result->includes[result->includes_count++] = include_str;
+}
+
+bool c2bsh_converter_check_include(c2bsh_converter_result* result, char* line) {
+  return str_starts_with(line, "#include");
+}
+
 // free result allocated memory
-void c2bsh_close(c2bsh_result* result) {
+void c2bsh_converter_close(c2bsh_converter_result* result) {
   free(result);
 }
