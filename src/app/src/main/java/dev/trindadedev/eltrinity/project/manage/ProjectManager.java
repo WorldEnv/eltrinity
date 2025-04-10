@@ -66,7 +66,11 @@ public class ProjectManager extends Contextualizable {
 
   /** Folder where all projects are stored */
   public static final File getProjectsFile() {
-    return new File(ELTrinity.getPublicFolderFile(), "projects/");
+    final File f = new File(ELTrinity.getPublicFolderFile(), "projects/");
+    if (!f.exists()) {
+      f.mkdirs();
+    }
+    return f;
   }
 
   /** The file where basic info of project are stored, like name, packageName */
