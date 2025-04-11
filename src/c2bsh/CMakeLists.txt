@@ -7,7 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
 set(PROJECT_NAME c2bsh)
-set(PROJECT_C_FILES src/main/c/c2bsh)
+set(PROJECT_C_FILES src/main/c)
 project(${PROJECT_NAME})
 
 # disable this if you're building just the source

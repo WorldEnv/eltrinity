@@ -10,7 +10,7 @@
 #include "../converter/converter.h"
 
 JNIEXPORT jlong JNICALL
-Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_convert
+Java_dev_trindadedev_c2bsh_C2BSH_convert
   (JNIEnv* env, jobject, jstring j_c_code) {
   char* c_code = (*env)->GetStringUTFChars(env, j_c_code, nullptr);
   c2bsh_converter_result* result_ptr = c2bsh_converter_convert(c_code);
@@ -18,7 +18,7 @@ Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_convert
 }
 
 JNIEXPORT jstring JNICALL
-Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_getCode
+Java_dev_trindadedev_c2bsh_C2BSH_getCode
   (JNIEnv* env, jobject, jlong result) {
   c2bsh_converter_result* result_ptr = (c2bsh_converter_result*) result;
   jstring bsh_code = (*env)->NewStringUTF(env, result_ptr->code);
@@ -26,7 +26,7 @@ Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_getCode
 }
 
 JNIEXPORT jobjectArray JNICALL
-Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_getIncludes
+Java_dev_trindadedev_c2bsh_C2BSH_getIncludes
   (JNIEnv* env, jobject, jlong result) {
   c2bsh_converter_result* result_ptr = (c2bsh_converter_result*) result;
   jclass string_class = (*env)->FindClass(env, "java/lang/String");
@@ -39,7 +39,7 @@ Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_getIncludes
 }
 
 JNIEXPORT void JNICALL
-Java_dev_trindadedev_eltrinity_c2bsh_C2BSH_close
+Java_dev_trindadedev_c2bsh_C2BSH_close
   (JNIEnv* env, jobject, jlong result) {
   c2bsh_converter_result* result_ptr = (c2bsh_converter_result*) result;
   c2bsh_converter_close(result_ptr);

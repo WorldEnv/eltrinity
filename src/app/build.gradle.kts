@@ -14,16 +14,6 @@ android {
     versionName = "1.0"
     
     vectorDrawables.useSupportLibrary = true
-
-    ndk {
-      abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-    }
-  }
-
-  externalNativeBuild {
-    cmake {
-      path = file("CMakeLists.txt")
-    }
   }
 
   compileOptions {
@@ -69,4 +59,5 @@ dependencies {
   implementation("com.google.android.material:material:1.13.0-alpha12")
   implementation("androidx.appcompat:appcompat:1.7.0")
   implementation("com.google.code.gson:gson:2.12.1")
+  implementation(project(":c2bsh"))
 }

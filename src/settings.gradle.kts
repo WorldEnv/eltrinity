@@ -14,6 +14,7 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Blockode"
+rootProject.name = "src"
 
 include(":app")
+include(":c2bsh")

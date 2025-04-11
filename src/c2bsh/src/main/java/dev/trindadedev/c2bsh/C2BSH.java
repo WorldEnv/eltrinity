@@ -1,4 +1,4 @@
-package dev.trindadedev.eltrinity.c2bsh;
+package dev.trindadedev.c2bsh;
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
