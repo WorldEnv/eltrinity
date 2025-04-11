@@ -1,0 +1,8 @@
+{
+  "project_name": "OpenGL ES Surface View Example",
+  "project_language": "beanshell",
+  "project_files": [ "main.bsh" ],
+  "project_description": "Simple OpenGL ES Surface Example!",
+  "project_author_name": "Aquiles Trindade",
+  "project_author_user_name": "trindadedev"
+}

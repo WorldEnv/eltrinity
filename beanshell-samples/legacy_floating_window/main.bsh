@@ -30,8 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.CompoundButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
-import dev.trindadedev.tbsh.event.Event;
-import dev.trindadedev.tbsh.project.API;
+import dev.trindadedev.eltrinity.project.Event;
 
 boolean aimLock = false;
 boolean aimBot = false;
@@ -42,14 +41,6 @@ boolean isRootViewAttached = false;
 
 // Root Layout for RootView
 final LinearLayout rootView = new LinearLayout(context);
-
-// Basic Infos for API
-api.project.setName("Floating Window");
-api.project.setDescription("An floating window like Game ModMenu Hack");
-api.project.setApiVersion(API.Version.One);
-api.project.setAuthor(
-  "Aquiles Trindade",
-  "trindadedev");
 
 // Creates an row with Linear, Text and Switch
 LinearLayout row(String text, CompoundButton.OnCheckedChangeListener listener) {

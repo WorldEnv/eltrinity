@@ -38,12 +38,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import dev.trindadedev.tbsh.event.Event;
-import dev.trindadedev.tbsh.project.API.Version;
-import dev.trindadedev.tbsh.util.FileUtil;
-import dev.trindadedev.tbsh.opengl.BSHGLSurfaceView;
-import dev.trindadedev.tbsh.opengl.BSHGLRenderer;
-import dev.trindadedev.tbsh.opengl.BSHGLRenderer.RendererEvents;
+import dev.trindadedev.eltrinity.project.Event;
+import dev.trindadedev.eltrinity.utils.FileUtil;
+import dev.trindadedev.eltrinity.opengl.BasicGLSurfaceView;
+import dev.trindadedev.eltrinity.opengl.BasicGLRenderer;
+import dev.trindadedev.eltrinity.opengl.BasicGLRenderer.RendererEvents;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -54,18 +53,10 @@ import java.util.List;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-// project infos
-api.project.setName("GTA 6");
-api.project.setDescription("The GTA 6!");
-api.project.setApiVersion(Version.One);
-api.project.setAuthor(
-  "Aquiles Trindade",
-  "trindadedev");
-
 // the root folder of the project.
 // used for map shaders and more
 // change this to the folder directory where this file is
-final File project_file = new File("/sdcard/bsh/opengles");
+final File project_file = projectPath;
 
 final MaterialButton open_window_button = new MaterialButton(context);
 
@@ -329,7 +320,7 @@ void window_init() {
   window_views[WINDOW_VIEWS_HEADER_TITLE] = new TextView(context);                       // Window Header Title
   window_views[WINDOW_VIEWS_HEADER_CLOSE_BUTTON] = new TextView(context);                // Window Header Close Button
   window_views[WINDOW_VIEWS_HEADER_MAXIMIZE_MINIMIZE_BUTTON] = new TextView(context);    // Window Header Maximize Button
-  window_views[WINDOW_VIEWS_GL_SURFACE] = new BSHGLSurfaceView(context);                 // OpenGL ES Surface
+  window_views[WINDOW_VIEWS_GL_SURFACE] = new BasicGLSurfaceView(context);                 // OpenGL ES Surface
   window_views[WINDOW_VIEWS_MOVE_BUTTONS_ROW] = new LinearLayout(context);               // Buttons Row
   window_views[WINDOW_VIEWS_MOVE_BUTTON_UP] = ui_create_button("UP", new Event() {       // UP Button
     public void onCallEvent() {
@@ -449,7 +440,7 @@ void window_init() {
     8,  // right
     0); // bottom
   window_views[WINDOW_VIEWS_HEADER_TITLE].setLayoutParams(window_header_title_view_params);
-  window_views[WINDOW_VIEWS_HEADER_TITLE].setText(api.project.name);
+  window_views[WINDOW_VIEWS_HEADER_TITLE].setText(project.basicInfo.name);
   window_views[WINDOW_VIEWS_HEADER_TITLE].setTextSize(WINDOW_HEADER_TITLE_SIZE);
   // end window header title
 
@@ -480,7 +471,7 @@ void window_init() {
       }
       // show an dialog to ask to close dialog
       utils_show_simple_dialog(
-        "Close " + api.project.name + "?", // title
+        "Close " + project.basicInfo.name + "?", // title
         "All data will be lost!",          // message
         "Close", "Cancel",                 // Confirm, Cancel buttons text
         new Event() {                      // On confirm event
@@ -899,7 +890,7 @@ int main() {
 
   boolean movingUp = true;
 
-  final BSHGLRenderer renderer = window_views[WINDOW_VIEWS_GL_SURFACE].getRenderer();
+  final BasicGLRenderer renderer = window_views[WINDOW_VIEWS_GL_SURFACE].getRenderer();
 
   renderer.events.setOnSurfaceCreated(new RendererEvents.OnSurfaceCreated() {
     public void onCallEvent(GL10 gl, EGLConfig config) {
