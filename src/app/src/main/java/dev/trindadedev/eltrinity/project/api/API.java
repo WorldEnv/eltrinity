@@ -99,6 +99,10 @@ public class API {
     return (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
   }
 
+  public final void onUiThread(final Event event) {
+    if (interpreter != null) interpreter.onUiThread(event);
+  }
+
   public static class LifecycleEvents extends Events {
     public Event onCreate = emptyEvent();
     public Event onResume = emptyEvent();

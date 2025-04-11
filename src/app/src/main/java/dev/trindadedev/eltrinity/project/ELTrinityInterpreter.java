@@ -16,6 +16,7 @@ package dev.trindadedev.eltrinity.project;
  * limitations under the License.
  */
 
+import android.app.Activity;
 import android.content.Context;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -251,7 +252,7 @@ public class ELTrinityInterpreter extends Interpreter {
   }
 
   public final void onUiThread(final Event event) {
-    context.runOnUiThread(() -> event.onCallEvent());
+    ((Activity) context).runOnUiThread(() -> event.onCallEvent());
   }
 
   public static class InterpreterEvents extends Events {
