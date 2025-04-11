@@ -53,11 +53,6 @@ import java.util.List;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-// the root folder of the project.
-// used for map shaders and more
-// change this to the folder directory where this file is
-final File project_file = projectPath;
-
 final MaterialButton open_window_button = new MaterialButton(context);
 
 // ------------- GAME VARS ---------------
@@ -668,8 +663,8 @@ void cube_create(float[] colors) {
   cube_draw_list_buffers[index].position(0);
 
   // reads shaders from shaders/cube folder.
-  final String vertex_shader_code = FileUtil.readFile(new File(project_file, "shaders/cube/vertex_shader.vert"));
-  final String fragment_shader_code = FileUtil.readFile(new File(project_file, "shaders/cube/fragment_shader.frag"));
+  final String vertex_shader_code = FileUtil.readFile(new File(project_path, "shaders/cube/vertex_shader.vert"));
+  final String fragment_shader_code = FileUtil.readFile(new File(project_path, "shaders/cube/fragment_shader.frag"));
   final int vertex_shader = utils_load_shader(GLES32.GL_VERTEX_SHADER, vertex_shader_code);
   final int fragment_shader = utils_load_shader(GLES32.GL_FRAGMENT_SHADER, fragment_shader_code);
 
@@ -809,8 +804,8 @@ void sphere_create(float radius, int stacks, int slices, float[] color) {
   sphere_index_buffers[index].position(0);
 
   // load shaders
-  final String vertex_shader_code = FileUtil.readFile(new File(project_file, "shaders/sphere/vertex_shader.vert"));
-  final String fragment_shader_code = FileUtil.readFile(new File(project_file, "shaders/sphere/fragment_shader.frag"));
+  final String vertex_shader_code = FileUtil.readFile(new File(project_path, "shaders/sphere/vertex_shader.vert"));
+  final String fragment_shader_code = FileUtil.readFile(new File(project_path, "shaders/sphere/fragment_shader.frag"));
   final int vertex_shader = utils_load_shader(GLES32.GL_VERTEX_SHADER, vertex_shader_code);
   final int fragment_shader = utils_load_shader(GLES32.GL_FRAGMENT_SHADER, fragment_shader_code);
 

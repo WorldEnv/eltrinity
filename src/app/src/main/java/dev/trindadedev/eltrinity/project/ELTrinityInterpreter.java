@@ -86,7 +86,7 @@ public class ELTrinityInterpreter extends Interpreter {
   private void configureVariables() throws EvalError {
     set("context", context);
     set("project", project);
-    set("projectPath", projectPath);
+    set("project_path", projectPath);
     set("api", api);
   }
 
