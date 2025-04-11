@@ -199,45 +199,59 @@ public class ELTrinityInterpreter extends Interpreter {
     source(bshFile.getAbsolutePath());
   }
 
-  public List<String> getLogs() {
-    return logs;
+  public final void addTaskLog(final String log) {
+    onUiThread(() -> {
+      logs.add(LOG_TASK + ": " + log);
+      events.onLogAdded.onCallEvent();
+    });
   }
 
-  public void addTaskLog(final String log) {
-    logs.add(LOG_TASK + ": " + log);
-    events.onLogAdded.onCallEvent();
+  public final void addSuccessLog(final String log) {
+    onUiThread(() -> {
+      logs.add(LOG_SUCCESS + ": " + log);
+      events.onLogAdded.onCallEvent();
+    });
   }
 
-  public void addSuccessLog(final String log) {
-    logs.add(LOG_SUCCESS + ": " + log);
-    events.onLogAdded.onCallEvent();
+  public final void addWarningLog(final String log) {
+    onUiThread(() -> {
+      logs.add(LOG_WARNING + ": " + log);
+      events.onLogAdded.onCallEvent();
+    });
   }
 
-  public void addWarningLog(final String log) {
-    logs.add(LOG_WARNING + ": " + log);
-    events.onLogAdded.onCallEvent();
+  public final void addErrorLog(final String log) {
+    onUiThread(() -> {
+      logs.add(LOG_ERROR + ": " + log);
+      events.onLogAdded.onCallEvent();
+    });
   }
 
-  public void addErrorLog(final String log) {
-    logs.add(LOG_ERROR + ": " + log);
-    events.onLogAdded.onCallEvent();
+  public final void addInfoLog(final String log) {
+    onUiThread(() -> {
+      logs.add(LOG_INFO + ": " + log);
+      events.onLogAdded.onCallEvent();
+    });
   }
 
-  public void addInfoLog(final String log) {
-    logs.add(LOG_INFO + ": " + log);
-    events.onLogAdded.onCallEvent();
-  }
-
-  public API getAPI() {
+  public final API getAPI() {
     return api;
   }
 
-  public InterpreterEvents getInterpreterEvents() {
+  public final InterpreterEvents getInterpreterEvents() {
     return events;
   }
 
-  public API.LifecycleEvents getProjectLifecycleEvents() {
+  public final API.LifecycleEvents getProjectLifecycleEvents() {
     return api.lifecycleEvents;
+  }
+
+  public final List<String> getLogs() {
+    return logs;
+  }
+
+  public final void onUiThread(final Event event) {
+    context.runOnUiThread(() -> event.onCallEvent());
   }
 
   public static class InterpreterEvents extends Events {
