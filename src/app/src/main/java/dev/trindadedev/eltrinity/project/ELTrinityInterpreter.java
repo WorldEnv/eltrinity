@@ -21,6 +21,8 @@ import android.content.Context;
 import bsh.EvalError;
 import bsh.Interpreter;
 import dev.trindadedev.c2bsh.C2BSH;
+import dev.trindadedev.c2bsh.C2BSHExt;
+import dev.trindadedev.c2bsh.C2BSHResult;
 import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.project.api.API;
 import dev.trindadedev.eltrinity.project.manage.ProjectManager;
@@ -160,12 +162,11 @@ public class ELTrinityInterpreter extends Interpreter {
   /** Converts the C lang code to BeanShell Code and compile it. */
   protected void evalCFile(final File file) throws EvalError {
     final String cCode = FileUtil.readFile(file);
-    final long c2bshResult = C2BSH.convert(cCode);
-    final String bshCode = C2BSH.getCode(c2bshResult);
+    final C2BSHResult c2bshResult = C2BSHExt.convert(cCode);
+    final String bshCode = c2bshResult.getCode();
     final File bshFile = new File(projectPath, "build/" + file.getName() + ".bsh");
     FileUtil.writeText(bshFile, bshCode);
     evalBSHFile(bshFile);
-    C2BSH.close(c2bshResult);
   }
 
   /** Evaluate an file of Project. */
@@ -189,8 +190,8 @@ public class ELTrinityInterpreter extends Interpreter {
 
   protected void sourceC(final File cFile) throws EvalError, IOException {
     final String cCode = FileUtil.readFile(cFile);
-    final long c2bshResult = C2BSH.convert(cCode);
-    final String bshCode = C2BSH.getCode(c2bshResult);
+    final C2BSHResult c2bshResult = C2BSHExt.convert(cCode);
+    final String bshCode = c2bshResult.getCode();
     final File bshFile = new File(projectPath, "build/" + cFile.getName() + ".bsh");
     FileUtil.writeText(bshFile, bshCode);
     sourceBSH(bshFile);
