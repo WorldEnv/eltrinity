@@ -4,6 +4,7 @@
  * in 2025-04-08
  */
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -28,4 +29,10 @@ void str_replace(char* str, const char* target, const char* replacement) {
   strcpy(buffer + before_len, replacement);                        // Add the replacement
   strcpy(buffer + before_len + replacement_len, pos + target_len); // Add the rest of the string after the target
   strcpy(str, buffer);                                             // Copy result back into original string
+}
+
+// trim string
+char* str_trim(char* str) {
+  while (isspace((unsigned char)*str)) str++;
+  return str;
 }

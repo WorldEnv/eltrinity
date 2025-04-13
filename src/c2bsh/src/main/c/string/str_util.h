@@ -15,4 +15,6 @@ bool str_starts_with(char* str, char* prefix);
 // Replaces an text in String (char*) by moving memory
 void str_replace(char* str, const char* target, const char* replacement);
 
+char* str_trim(char* str);
+
 #endif
