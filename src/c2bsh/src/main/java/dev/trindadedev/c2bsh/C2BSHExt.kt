@@ -1,4 +1,6 @@
-package dev.trindadedev.c2bsh;
+@file:JvmName("C2BSHExt")
+
+package dev.trindadedev.c2bsh
 
 /*
  * Copyright 2025 Aquiles Trindade (trindadedev).
@@ -16,16 +18,6 @@ package dev.trindadedev.c2bsh;
  * limitations under the License.
  */
 
-public class C2BSH {
-  static {
-    System.loadLibrary("c2bsh");
-  }
-
-  public static native long convert(final String cCode);
-
-  public static native String getCode(final long c2bshResult);
-
-  public static native String[] getIncludes(final long c2bshResult);
-
-  public static native void close(final long c2bshResult);
+fun convert(cCode: String): C2BSHResult {
+  return C2BSHResult(C2BSH.convert(cCode))
 }
