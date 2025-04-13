@@ -16,7 +16,6 @@ package dev.trindadedev.c2bsh
  * limitations under the License.
  */
 
-
 class C2BSHResult(private var nativePtr: Long) : AutoCloseable {
 
   val code: String

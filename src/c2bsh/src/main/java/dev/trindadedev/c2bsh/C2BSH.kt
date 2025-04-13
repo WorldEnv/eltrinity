@@ -21,15 +21,11 @@ object C2BSH {
     System.loadLibrary("c2bsh")
   }
 
-  @JvmStatic
-  external fun convert(cCode: String): Long
+  @JvmStatic external fun convert(cCode: String): Long
 
-  @JvmStatic
-  external fun getCode(c2bshResult: Long): String
+  @JvmStatic external fun getCode(c2bshResult: Long): String
 
-  @JvmStatic
-  external fun getIncludes(c2bshResult: Long): Array<String>
+  @JvmStatic external fun getIncludes(c2bshResult: Long): Array<String>
 
-  @JvmStatic
-  external fun close(c2bshResult: Long)
+  @JvmStatic external fun close(c2bshResult: Long)
 }
