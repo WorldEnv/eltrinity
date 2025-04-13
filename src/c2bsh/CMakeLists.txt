@@ -23,6 +23,7 @@ if (PROJECT_ANDROID_BUILD)
     ${PROJECT_C_FILES}/converter/converter.c
     ${PROJECT_C_FILES}/file/file_util.c
     ${PROJECT_C_FILES}/string/str_util.c
+    ${PROJECT_C_FILES}/format/formatter.c
     ${PROJECT_C_FILES}/log.c)
 
   # header files (.h)
@@ -32,6 +33,7 @@ if (PROJECT_ANDROID_BUILD)
     ${PROJECT_C_FILES}/converter/converter.h
     ${PROJECT_C_FILES}/file/file_util.h
     ${PROJECT_C_FILES}/string/str_util.h
+    ${PROJECT_C_FILES}/format/formatter.h
     ${PROJECT_C_FILES}/log.h)
 else()
   # source files (.c)
@@ -40,6 +42,7 @@ else()
     ${PROJECT_C_FILES}/converter/converter.c
     ${PROJECT_C_FILES}/file/file_util.c
     ${PROJECT_C_FILES}/string/str_util.c
+    ${PROJECT_C_FILES}/format/formatter.c
     ${PROJECT_C_FILES}/log.c)
 
   # header files (.h)
@@ -48,6 +51,7 @@ else()
     ${PROJECT_C_FILES}/converter/converter.h
     ${PROJECT_C_FILES}/file/file_util.h
     ${PROJECT_C_FILES}/string/str_util.h
+    ${PROJECT_C_FILES}/format/formatter.h
     ${PROJECT_C_FILES}/log.h)
 endif()
 
