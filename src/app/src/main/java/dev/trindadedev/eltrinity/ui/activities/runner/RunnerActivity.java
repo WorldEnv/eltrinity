@@ -60,7 +60,7 @@ public class RunnerActivity extends BaseAPIActivity {
   }
 
   @Override
-  @NonNull
+  @Nullable
   protected View bindLayout() {
     binding = ActivityRunnerBinding.inflate(getLayoutInflater());
     return binding.getRoot();

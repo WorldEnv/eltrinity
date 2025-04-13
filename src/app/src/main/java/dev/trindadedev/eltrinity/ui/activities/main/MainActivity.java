@@ -39,7 +39,7 @@ public class MainActivity extends BaseAppCompatActivity {
   private ProjectsAdapter projectsAdapter;
 
   @Override
-  @NonNull
+  @Nullable
   protected View bindLayout() {
     binding = ActivityMainBinding.inflate(getLayoutInflater());
     return binding.getRoot();

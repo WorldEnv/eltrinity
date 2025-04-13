@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
 import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -34,7 +35,6 @@ import dev.trindadedev.eltrinity.os.PermissionManager;
 import dev.trindadedev.eltrinity.os.PermissionStatus;
 import dev.trindadedev.eltrinity.os.PermissionType;
 import dev.trindadedev.eltrinity.ui.components.dialog.ProgressDialog;
-import dev.trindadedev.eltrinity.utils.EdgeToEdge;
 import dev.trindadedev.eltrinity.utils.PrintUtil;
 import dev.trindadedev.eltrinity.utils.StringUtil;
 import dev.trindadedev.eltrinity.project.Event;
@@ -45,7 +45,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
 
   public static final int TOAST_LENGHT = 4000;
 
-  @NonNull private View rootView;
+  @Nullable private View rootView;
   @NonNull private ProgressDialog progressDialog;
   @NonNull protected PermissionManager.Storage storagePermissionManager;
   @NonNull protected PermissionManager.Overlay overlayPermissionManager;
@@ -75,7 +75,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
   protected void onCreate(@Nullable final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     rootView = bindLayout();
-    setContentView(rootView);
+    if (rootView != null) setContentView(rootView);
     onBindLayout(savedInstanceState);
     EdgeToEdge.enable(this);
     storagePermissionManager =
@@ -94,7 +94,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
   }
 
   // should return the root view of screen layout
-  @NonNull
+  @Nullable
   protected abstract View bindLayout();
 
   // called just after bind the layout with the setContentView
