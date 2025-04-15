@@ -18,7 +18,7 @@ package dev.trindadedev.c2bsh
 
 object C2BSH {
   init {
-    System.loadLibrary("c2bsh")
+    System.loadLibrary("C2BSH")
   }
 
   @JvmStatic external fun convert(cCode: String): Long

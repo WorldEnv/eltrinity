@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-  namespace = "dev.trindadedev.c2bsh"
+  namespace = "dev.trindadedev.eltrinity.common"
   compileSdk = 34
 
   defaultConfig {
@@ -41,8 +41,4 @@ android {
   kotlin {
     jvmToolchain(17)
   }
-}
-
-dependencies {
-  implementation(project(":common"))
 }

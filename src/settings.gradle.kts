@@ -18,3 +18,4 @@ rootProject.name = "src"
 
 include(":app")
 include(":c2bsh")
+include(":common")
