@@ -63,6 +63,6 @@ dependencies {
   implementation("androidx.constraintlayout:constraintlayout:2.2.1")
   implementation("com.google.android.material:material:1.13.0-alpha13")
   implementation("androidx.appcompat:appcompat:1.7.0")
-  implementation("com.google.code.gson:gson:2.13.0")
+  implementation("com.google.code.gson:gson:2.13.1")
   implementation(project(":c2bsh"))
 }
