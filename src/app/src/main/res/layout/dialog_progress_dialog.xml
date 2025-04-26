@@ -7,15 +7,17 @@
   android:orientation="vertical"
   android:layout_gravity="center">
 
-  <com.google.android.material.loadingindicator.LoadingIndicator
-    android:layout_height="wrap_content"
+  <com.google.android.material.progressindicator.CircularProgressIndicator
     android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/indicator"
     app:indicatorSize="100dp"
-    android:id="@+id/indicator" />
+    app:trackThickness="8dp" />
 
   <TextView
-    android:layout_height="wrap_content"
     android:layout_width="wrap_content"
-    android:id="@+id/text" />
+    android:layout_height="wrap_content"
+    android:id="@+id/text"
+    android:text="Loading..." />
 
 </LinearLayout>

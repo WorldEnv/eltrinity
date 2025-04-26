@@ -1,0 +1,94 @@
+[versions]
+agp = "8.8.1"
+
+android-jvm = "21"
+android-compileSdk = "35"
+android-targetSdk = "35"
+android-minSdk = "21"
+
+kotlin = "2.1.10"
+
+google-material = "1.12.0"
+google-gson = "2.12.1"
+
+androidx-appcompat = "1.7.0"
+androidx-lifecycle-runtime-ktx = "2.8.7"
+androidx-core-ktx = "1.15.0"
+androidx-fragment-ktx = "1.8.6"
+androidx-annotation = "1.9.1"
+
+compose-activity = "1.10.1"
+compose-navigation = "2.8.7"
+compose-viewmodel = "2.8.7"
+compose-material-icons-extended = "1.7.8"
+compose-version = "1.8.0-rc01"
+compose-scrolleffect = "1.0.1"
+compose-material3 = "1.4.0-alpha10"
+
+ktx-coroutines = "1.10.1"
+ktx-serialization-json = "1.8.0"
+
+[plugins]
+# Android Gradle Plugin
+agp-lib = { id = "com.android.library", version.ref = "agp" }
+agp-app = { id = "com.android.application", version.ref = "agp" } 
+
+# Kotlin
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+# Compose
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+[libraries]
+google-material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
+google-gson = { group = "com.google.code.gson", name = "gson", version.ref ="google-gson" }
+
+# Commons
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle-runtime-ktx" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidx-fragment-ktx" }
+androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "androidx-annotation" }
+
+# Compose
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose-version" }
+compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "compose-version" }
+compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "compose-version" }
+compose-material = { group = "androidx.compose.material", name = "material", version.ref = "compose-version" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "compose-material3" }
+compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose-version" }
+compose-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "compose-version" }
+compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "compose-version"}
+compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "compose-activity" }
+compose-material-icons = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose-material-icons-extended" }
+compose-scrolleffect = { group = "com.github.trindadedev13", name = "ScrollEffect", version.ref = "compose-scrolleffect" }
+compose-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "compose-viewmodel" }
+compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "compose-navigation" }
+
+# Kotlin X
+ktx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "ktx-coroutines" }
+ktx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "ktx-coroutines" }
+ktx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "ktx-serialization-json" }
+
+[bundles]
+androidx = [
+    "androidx-appcompat",
+    "androidx-lifecycle-runtime-ktx",
+    "androidx-core-ktx",
+    "androidx-fragment-ktx",
+    "androidx-annotation"
+]
+compose = [
+    "compose-foundation",
+    "compose-foundation-layout",
+    "compose-runtime",
+    "compose-material",
+    "compose-material3",
+    "compose-ui",
+    "compose-ui-graphics",
+    "compose-ui-text-google-fonts",
+    "compose-activity",
+    "compose-material-icons",
+]
