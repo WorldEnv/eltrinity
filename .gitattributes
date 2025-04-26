@@ -1,1 +1,2 @@
 *.bsh linguist-language=Java
+CMakeLists.txt linguist-language=C
