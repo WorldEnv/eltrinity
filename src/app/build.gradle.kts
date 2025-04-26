@@ -1,16 +1,19 @@
 plugins {
-  id("com.android.application")
-  id("org.jetbrains.kotlin.android")
+  alias(libs.plugins.agp.app)
+  alias(libs.plugins.kotlin)
+  alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.compose.compiler)
+  id("kotlin-parcelize")
 }
 
 android {
   namespace = "dev.trindadedev.eltrinity"
-  compileSdk = 34
-
+  compileSdk = libs.versions.android.compileSdk.get().toInt()
+  
   defaultConfig {
+    minSdk = libs.versions.android.minSdk.get().toInt()
+    targetSdk = libs.versions.android.targetSdk.get().toInt()
     applicationId = "dev.trindadedev.eltrinity"
-    minSdk = 21
-    targetSdk = 34
     versionCode = 1
     versionName = "1.0"
     
@@ -18,8 +21,8 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.toVersion(libs.versions.android.jvm.get().toInt())
+    targetCompatibility = JavaVersion.toVersion(libs.versions.android.jvm.get().toInt())
   }
 
   signingConfigs {
@@ -53,16 +56,17 @@ android {
     viewBinding = true
   }
 
-  kotlin {
-    jvmToolchain(17)
+  kotlinOptions {
+    jvmTarget = libs.versions.android.jvm.get()
   }
 }
 
 dependencies {
   implementation(files("libs/beanshell.jar"))
-  implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-  implementation("com.google.android.material:material:1.13.0-alpha13")
-  implementation("androidx.appcompat:appcompat:1.7.0")
-  implementation("com.google.code.gson:gson:2.13.1")
-  implementation(project(":c2bsh"))
+
+  implementation(libs.bundles.androidx)
+  implementation(libs.google.gson)
+  implementation(libs.google.material)
+
+  implementation(projects.c2bsh)
 }

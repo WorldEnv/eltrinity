@@ -1,10 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-  id("com.android.application") version "8.9.2" apply false
-  id("com.android.library") version "8.9.2" apply false
-  id("org.jetbrains.kotlin.android") version "2.1.20" apply false
-}
-
-tasks.register<Delete>("clean") {
-  delete(rootProject.buildDir)
+  alias(libs.plugins.agp.lib) apply false
+  alias(libs.plugins.agp.app) apply false
+  alias(libs.plugins.kotlin) apply false
+  alias(libs.plugins.kotlin.jvm) apply false
+  alias(libs.plugins.kotlin.serialization) apply false
+  alias(libs.plugins.compose.compiler) apply false
 }
