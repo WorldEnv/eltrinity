@@ -25,6 +25,7 @@ import dev.trindadedev.c2bsh.C2BSHExt;
 import dev.trindadedev.c2bsh.C2BSHResult;
 import dev.trindadedev.eltrinity.beans.ProjectBean;
 import dev.trindadedev.eltrinity.project.api.API;
+import dev.trindadedev.eltrinity.project.api.LifecycleEvents;
 import dev.trindadedev.eltrinity.project.manage.ProjectManager;
 import dev.trindadedev.eltrinity.utils.FileUtil;
 import java.io.File;
@@ -244,7 +245,7 @@ public class ELTrinityInterpreter extends Interpreter {
     return events;
   }
 
-  public final API.LifecycleEvents getProjectLifecycleEvents() {
+  public final LifecycleEvents getProjectLifecycleEvents() {
     return api.lifecycleEvents;
   }
 

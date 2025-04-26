@@ -102,42 +102,4 @@ public class API {
   public final void onUiThread(final Event event) {
     if (interpreter != null) interpreter.onUiThread(event);
   }
-
-  public static class LifecycleEvents extends Events {
-    public Event onCreate = emptyEvent();
-    public Event onResume = emptyEvent();
-    public Event onDestroy = emptyEvent();
-    public Event onStart = emptyEvent();
-    public Event onPause = emptyEvent();
-    public Event onStop = emptyEvent();
-    public Event onPostCreate = emptyEvent();
-
-    public void setOnCreate(final Event onCreate) {
-      this.onCreate = onCreate;
-    }
-
-    public void setOnResume(final Event onResume) {
-      this.onResume = onResume;
-    }
-
-    public void setOnDestroy(final Event onDestroy) {
-      this.onDestroy = onDestroy;
-    }
-
-    public void setOnStart(final Event onStart) {
-      this.onStart = onStart;
-    }
-
-    public void setOnPause(final Event onPause) {
-      this.onPause = onPause;
-    }
-
-    public void setOnStop(final Event onStop) {
-      this.onStop = onStop;
-    }
-
-    public void setOnPostCreate(final Event onPostCreate) {
-      this.onStart = onStart;
-    }
-  }
 }
