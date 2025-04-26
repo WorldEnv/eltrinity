@@ -1,4 +1,4 @@
-# Basic Information
+# Basic Information (basic_info.json)
 
 ## project_name
 - The name of your project.
