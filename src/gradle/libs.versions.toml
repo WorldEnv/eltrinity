@@ -41,9 +41,6 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 # Compose
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
-# AboutLibraries
-about-libraries-plugin = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
-
 [libraries]
 google-material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
 google-gson = { group = "com.google.code.gson", name = "gson", version.ref ="google-gson" }
