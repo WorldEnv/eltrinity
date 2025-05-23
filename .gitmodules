@@ -1,0 +1,3 @@
+[submodule "src/c2bsh"]
+	path = src/c2bsh
+	url = https://github.com/trindadedev13/c2bsh
