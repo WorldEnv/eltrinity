@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "file_util.h"
-#include "../log.h"
+#include "log.h"
 
 char* file_read_text(char* file_path) {
   long file_length;

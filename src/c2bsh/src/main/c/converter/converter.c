@@ -10,15 +10,15 @@
 #include <stdio.h>
 #include <string.h>
 #include "converter.h"
-#include "../string/str_util.h"
-#include "../format/formatter.h"
-#include "../log.h"
+#include "string/str_util.h"
+#include "format/formatter.h"
+#include "log.h"
 
 // Converts the C lang code to Bean shell code
 // @param c_code The CLang Code.
 // @returns the result
 // @see c2bsh_converter_result struct in converter.h
-c2bsh_converter_result* c2bsh_converter_convert(char* c_code) {
+c2bsh_converter_result* c2bsh_converter_convert(const char* c_code) {
   c2bsh_converter_result* result = malloc(sizeof(c2bsh_converter_result));
   size_t code_size = 1024 * 10;
   result->code = calloc(1, code_size);            // 10KB Buffer.

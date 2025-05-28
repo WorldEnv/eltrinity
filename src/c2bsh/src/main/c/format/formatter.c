@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "formatter.h"
-#include "../log.h"
+#include "log.h"
 
 // Adds indentation to the buffer based on the indentation level
 void formatter_append_indent(char* buffer, int* pos, int indent_level) {

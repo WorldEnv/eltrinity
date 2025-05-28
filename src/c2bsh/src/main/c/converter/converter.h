@@ -22,7 +22,7 @@ typedef struct {
 // @param c_code The CLang Code
 // @returns the result
 // @see c2bsh_converter_result struct
-c2bsh_converter_result* c2bsh_converter_convert(char* c_code);
+c2bsh_converter_result* c2bsh_converter_convert(const char* c_code);
 
 // Checks if line starts with #include
 // if true its a include

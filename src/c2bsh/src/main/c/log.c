@@ -4,12 +4,11 @@
  * Updated in 2025-04-10
  */
 
-#include "config.h"
 #include "log.h"
 
 #include <stdarg.h>
 
-#if PROJECT_ANDROID_BUILD
+#ifdef C2BSH_ANDROID
 
 #include "android/android_log.h"
 
