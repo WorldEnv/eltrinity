@@ -14,7 +14,7 @@ google-gson = "2.13.1"
 androidx-appcompat = "1.7.1"
 androidx-lifecycle-runtime-ktx = "2.9.0"
 androidx-core-ktx = "1.16.0"
-androidx-fragment-ktx = "1.8.7"
+androidx-fragment-ktx = "1.8.8"
 androidx-annotation = "1.9.1"
 
 compose-activity = "1.10.1"
